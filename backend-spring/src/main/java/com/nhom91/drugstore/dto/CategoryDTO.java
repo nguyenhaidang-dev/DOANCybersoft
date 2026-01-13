@@ -1,0 +1,23 @@
+package com.nhom91.drugstore.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CategoryDTO {
+    private Long id;
+    private String name;
+    private String description;
+    private Boolean isShow;
+    private String parentCategory;
+    private Boolean isParent;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    // DTO for Category responses
+}
