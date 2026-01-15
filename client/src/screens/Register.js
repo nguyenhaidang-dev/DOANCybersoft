@@ -10,6 +10,7 @@ const Register = ({ location, history }) => {
   window.scrollTo(0, 0);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ const Register = ({ location, history }) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    dispatch(register(name, email, password));
+    dispatch(register(name, email, phone, password));
   };
 
   return (
@@ -47,10 +48,16 @@ const Register = ({ location, history }) => {
             onChange={(e) => setName(e.target.value)}
           />
           <input
-            type="number"
-            placeholder="Số điện thoại"
+            type="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="tel"
+            placeholder="Số điện thoại"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <input
             type="password"

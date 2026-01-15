@@ -94,10 +94,10 @@ const MainPdf = () => {
               {/* Products */}
               {isSearch == 0
                 ? products.map((product) => (
-                    <Pdf product={product} key={product._id} />
+                    <Pdf product={product} key={product.id} />
                   ))
                 : data.map((product) => (
-                    <Pdf product={product} key={product._id} />
+                    <Pdf product={product} key={product.id} />
                   ))}
             </div>
           )}

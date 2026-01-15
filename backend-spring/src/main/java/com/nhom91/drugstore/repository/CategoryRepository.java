@@ -13,6 +13,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByIsParentFalse();
 
     List<Category> findByIsShowTrueAndIsParentFalseAndParentCategory(String parentCategory);
-
-    // Migrated from Mongoose Category.find in NodeJS
 }

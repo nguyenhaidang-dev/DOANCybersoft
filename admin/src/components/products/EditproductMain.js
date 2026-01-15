@@ -74,7 +74,7 @@ const EditProductMain = (props) => {
       dispatch({ type: PRODUCT_UPDATE_RESET });
       toast.success("Product Updated", ToastObjects);
     } else {
-      if (!product.name || product._id !== productId) {
+      if (!product.name || product.id !== productId) {
         dispatch(editProduct(productId));
       } else {
         setName(product.name);

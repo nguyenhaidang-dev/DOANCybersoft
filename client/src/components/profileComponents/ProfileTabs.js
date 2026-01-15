@@ -9,6 +9,7 @@ import { updateUserProfile } from "../../Redux/Actions/userActions";
 const ProfileTabs = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const toastId = React.useRef(null);
@@ -32,6 +33,7 @@ const ProfileTabs = () => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
+      setPhone(user.phone || "");
     }
   }, [dispatch, user]);
 
@@ -43,7 +45,7 @@ const ProfileTabs = () => {
         toastId.current = toast.error("Mật khẩu không hợp lệ", Toastobjects);
       }
     } else {
-      dispatch(updateUserProfile({ id: user._id, name, email, password }));
+      dispatch(updateUserProfile({ id: user.id, name, email, phone, password }));
       if (!toast.isActive(toastId.current)) {
         toastId.current = toast.success("Cập nhật thành công", Toastobjects);
       }
@@ -71,13 +73,25 @@ const ProfileTabs = () => {
 
         <div className="col-md-6">
           <div className="form">
-            <label for="account-email">Số điện thoại</label>
+            <label for="account-email">Email</label>
             <input
               className="form-control"
-              type="number"
+              type="email"
               value={email}
               required
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <div className="form">
+            <label for="account-phone">Số điện thoại</label>
+            <input
+              className="form-control"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
           </div>
         </div>

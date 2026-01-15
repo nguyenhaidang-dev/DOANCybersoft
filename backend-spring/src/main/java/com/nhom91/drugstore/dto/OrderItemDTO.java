@@ -17,6 +17,4 @@ public class OrderItemDTO {
     private BigDecimal price;
     private BigDecimal loanPrice;
     private ProductDTO product;
-
-    // DTO for OrderItem responses
 }

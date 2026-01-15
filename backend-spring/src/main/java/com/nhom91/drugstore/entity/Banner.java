@@ -36,5 +36,4 @@ public class Banner {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Migrated from NodeJS BannerModel
 }

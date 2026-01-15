@@ -14,5 +14,4 @@ public class PaymentResultDTO {
     private String updateTime;
     private String emailAddress;
 
-    // DTO for PaymentResult responses
 }

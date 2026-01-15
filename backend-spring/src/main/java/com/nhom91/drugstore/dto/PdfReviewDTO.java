@@ -17,5 +17,4 @@ public class PdfReviewDTO {
     private Long userId;
     private LocalDateTime createdAt;
 
-    // DTO for PdfReview responses
 }

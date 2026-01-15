@@ -1,5 +1,6 @@
 package com.nhom91.drugstore.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,4 @@ public class PdfDTO {
     private Integer numReviews;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    // DTO for Pdf responses
 }

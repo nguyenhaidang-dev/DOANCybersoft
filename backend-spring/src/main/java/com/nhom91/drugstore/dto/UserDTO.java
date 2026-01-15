@@ -13,9 +13,8 @@ public class UserDTO {
     private Long id;
     private String name;
     private String email;
+    private String phone;
     private Boolean isAdmin;
     private LocalDateTime createdAt;
     private String token;
-
-    // DTO for User responses, migrated from NodeJS user responses
 }

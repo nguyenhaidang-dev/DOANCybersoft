@@ -1,190 +1,24 @@
 package com.nhom91.drugstore.service;
 
 import com.nhom91.drugstore.dto.*;
-import com.nhom91.drugstore.entity.Category;
-import com.nhom91.drugstore.entity.Product;
-import com.nhom91.drugstore.entity.ProductReview;
 import com.nhom91.drugstore.entity.User;
-import com.nhom91.drugstore.repository.CategoryRepository;
-import com.nhom91.drugstore.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
+import com.nhom91.drugstore.request.CreateProductRequest;
+import com.nhom91.drugstore.request.ProductReviewRequest;
+import com.nhom91.drugstore.request.UpdateProductRequest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-public class ProductService {
-
-    private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
-
-    public Page<ProductDTO> getAllProducts(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-        Page<Product> products;
-        if (keyword != null && !keyword.isEmpty()) {
-            products = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
-        } else {
-            products = productRepository.findAll(pageable);
-        }
-        return products.map(this::convertToDTO);
-    }
-
-    public List<ProductDTO> getAllProductsAdmin() {
-        return productRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<ProductDTO> getAllProductsPrescription() {
-        return productRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public ProductDTO getProductById(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        return convertToDTO(product);
-    }
-
-    @Transactional
-    public ProductDTO createProduct(CreateProductRequest request, Long userId) {
-        if (productRepository.findByNameContainingIgnoreCase(request.getName(), PageRequest.of(0, 1)).hasContent()) {
-            throw new RuntimeException("Product name already exists");
-        }
-
-        Product product = new Product();
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
-        product.setDescription(request.getDescription());
-        product.setImage(request.getImage());
-        product.setCountInStock(request.getCountInStock());
-        product.setLoanPrice(request.getLoanPrice());
-        product.setMa(request.getMa());
-        product.setIsBought(request.getBought());
-
-        if (request.getCategory() != null) {
-            Category category = categoryRepository.findById(request.getCategory())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            product.setCategory(category);
-        }
-
-        Product savedProduct = productRepository.save(product);
-        return convertToDTO(savedProduct);
-    }
-
-    @Transactional
-    public ProductDTO updateProduct(Long id, UpdateProductRequest request) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        if (request.getName() != null) product.setName(request.getName());
-        if (request.getPrice() != null) product.setPrice(request.getPrice());
-        if (request.getDescription() != null) product.setDescription(request.getDescription());
-        if (request.getImage() != null) product.setImage(request.getImage());
-        if (request.getCountInStock() != null) product.setCountInStock(request.getCountInStock());
-        if (request.getLoanPrice() != null) product.setLoanPrice(request.getLoanPrice());
-        if (request.getCategory() != null) {
-            Category category = categoryRepository.findById(request.getCategory())
-                    .orElseThrow(() -> new RuntimeException("Category not found"));
-            product.setCategory(category);
-        }
-        if (request.getMa() != null) product.setMa(request.getMa());
-        if (request.getBought() != null) product.setIsBought(request.getBought());
-
-        Product updatedProduct = productRepository.save(product);
-        return convertToDTO(updatedProduct);
-    }
-
-    @Transactional
-    public void deleteProduct(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        productRepository.delete(product);
-    }
-
-    @Transactional
-    public void addProductReview(Long productId, ProductReviewRequest request, User user) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-
-        // Check if user already reviewed
-        boolean alreadyReviewed = product.getReviews().stream()
-                .anyMatch(review -> review.getUser().getId().equals(user.getId()));
-        if (alreadyReviewed) {
-            throw new RuntimeException("Product already reviewed");
-        }
-
-        ProductReview review = new ProductReview();
-        review.setRating(request.getRating());
-        review.setComment(request.getComment());
-        review.setUser(user);
-        review.setProduct(product);
-
-        product.getReviews().add(review);
-        updateProductRating(product);
-
-        productRepository.save(product);
-    }
-
-    public List<ProductDTO> searchProducts(String type) {
-        return productRepository.findByNameContainingIgnoreCase(type, PageRequest.of(0, 100))
-                .getContent().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<ProductDTO> searchPrescriptionProducts(String type) {
-        return productRepository.findByNameContainingIgnoreCase(type, PageRequest.of(0, 100))
-                .getContent().stream()
-                .filter(product -> product.getCategory() != null && "6448dce26d5176c1e67a4cb6".equals(product.getCategory().getId().toString()))
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    public List<ProductDTO> getProductsByCategory(Long categoryId) {
-        return productRepository.findByCategoryId(categoryId).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    private void updateProductRating(Product product) {
-        if (!product.getReviews().isEmpty()) {
-            double avgRating = product.getReviews().stream()
-                    .mapToInt(ProductReview::getRating)
-                    .average()
-                    .orElse(0.0);
-            product.setRating(BigDecimal.valueOf(avgRating).setScale(2, RoundingMode.HALF_UP));
-            product.setNumReviews(product.getReviews().size());
-        }
-    }
-
-    private ProductDTO convertToDTO(Product product) {
-        CategoryDTO categoryDTO = product.getCategory() != null ?
-                new CategoryDTO(product.getCategory().getId(), product.getCategory().getName(),
-                        product.getCategory().getDescription(), product.getCategory().getIsShow(),
-                        product.getCategory().getParentCategory(), product.getCategory().getIsParent(),
-                        product.getCategory().getCreatedAt(), product.getCategory().getUpdatedAt()) : null;
-
-        List<ProductReviewDTO> reviewDTOs = product.getReviews().stream()
-                .map(review -> new ProductReviewDTO(review.getId(), review.getRating(), review.getComment(),
-                        review.getUser().getName(), review.getUser().getId(), review.getCreatedAt()))
-                .collect(Collectors.toList());
-
-        return new ProductDTO(product.getId(), product.getMa(), product.getName(), product.getImage(),
-                product.getDescription(), reviewDTOs, product.getRating(), product.getNumReviews(),
-                categoryDTO, product.getPrice(), product.getCountInStock(), product.getLoanPrice(),
-                product.getIsBought(), product.getCreatedAt(), product.getUpdatedAt());
-    }
-
-    // Migrated from NodeJS ProductRoutes logic
+public interface ProductService {
+    Page<ProductDTO> getAllProducts(String keyword, int page, int size);
+    List<ProductDTO> getAllProductsAdmin();
+    List<ProductDTO> getAllProductsPrescription();
+    ProductDTO getProductById(Long id);
+    ProductDTO createProduct(CreateProductRequest request, Long userId);
+    ProductDTO updateProduct(Long id, UpdateProductRequest request);
+    void deleteProduct(Long id);
+    void addProductReview(Long productId, ProductReviewRequest request, User user);
+    List<ProductDTO> searchProducts(String type);
+    List<ProductDTO> searchPrescriptionProducts(String type);
+    List<ProductDTO> getProductsByCategory(Long categoryId);
 }

@@ -11,7 +11,7 @@ const Slide = () => {
     new Promise(async () => {
       const res = await axios.get("/api/category/all/banner");
       if (res.data) {
-        setItems(res.data);
+        setItems(res.data.data || []);
       }
     }, []);
   }, []);

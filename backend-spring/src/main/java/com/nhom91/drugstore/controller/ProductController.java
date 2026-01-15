@@ -2,7 +2,12 @@ package com.nhom91.drugstore.controller;
 
 import com.nhom91.drugstore.dto.*;
 import com.nhom91.drugstore.entity.User;
+import com.nhom91.drugstore.request.CreateProductRequest;
+import com.nhom91.drugstore.request.ProductReviewRequest;
+import com.nhom91.drugstore.request.UpdateProductRequest;
+import com.nhom91.drugstore.response.BaseResponse;
 import com.nhom91.drugstore.service.ProductService;
+import com.nhom91.drugstore.utils.ResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,99 +28,96 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllProducts(
+    public ResponseEntity<BaseResponse> getAllProducts(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int pageNumber) {
         Page<ProductDTO> page = productService.getAllProducts(keyword, pageNumber, 12);
-        Map<String, Object> response = Map.of(
-                "products", page.getContent(),
-                "page", page.getNumber() + 1,
-                "pages", page.getTotalPages()
-        );
-        return ResponseEntity.ok(response);
+        Map<String, Object> data = new HashMap<>();
+        data.put("products", page.getContent());
+        data.put("page", page.getNumber() + 1);
+        data.put("pages", page.getTotalPages());
+        return ResponseFactory.success(data);
     }
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ProductDTO>> getAllProductsAdmin() {
+    public ResponseEntity<BaseResponse> getAllProductsAdmin() {
         List<ProductDTO> products = productService.getAllProductsAdmin();
-        return ResponseEntity.ok(products);
+        return ResponseFactory.success(products);
     }
 
     @GetMapping("/all-prescription")
-    public ResponseEntity<List<ProductDTO>> getAllProductsPrescription() {
+    public ResponseEntity<BaseResponse> getAllProductsPrescription() {
         List<ProductDTO> products = productService.getAllProductsPrescription();
-        return ResponseEntity.ok(products);
+        return ResponseFactory.success(products);
     }
 
     @GetMapping("/search/{type}")
-    public ResponseEntity<List<ProductDTO>> searchProducts(@PathVariable String type) {
+    public ResponseEntity<BaseResponse> searchProducts(@PathVariable String type) {
         List<ProductDTO> products = productService.searchProducts(type);
-        return ResponseEntity.ok(products);
+        return ResponseFactory.success(products);
     }
 
     @GetMapping("/search-prescription/{type}")
-    public ResponseEntity<List<ProductDTO>> searchPrescriptionProducts(@PathVariable String type) {
+    public ResponseEntity<BaseResponse> searchPrescriptionProducts(@PathVariable String type) {
         List<ProductDTO> products = productService.searchPrescriptionProducts(type);
-        return ResponseEntity.ok(products);
+        return ResponseFactory.success(products);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> getProductById(@PathVariable Long id) {
         ProductDTO product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+        return ResponseFactory.success(product);
     }
 
     @PostMapping("/{id}/review")
-    public ResponseEntity<Map<String, String>> addProductReview(
+    public ResponseEntity<BaseResponse> addProductReview(
             @PathVariable Long id,
             @Valid @RequestBody ProductReviewRequest request,
             @AuthenticationPrincipal User user) {
         productService.addProductReview(id, request, user);
-        return ResponseEntity.status(201).body(Map.of("message", "Review added"));
+        return ResponseFactory.successMessage("Đánh giá đã được thêm");
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, String>> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return ResponseEntity.ok(Map.of("message", "Product deleted"));
+        return ResponseFactory.successMessage("Xóa sản phẩm thành công");
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProductDTO> createProduct(
+    public ResponseEntity<BaseResponse> createProduct(
             @Valid @RequestBody CreateProductRequest request,
             @AuthenticationPrincipal User user) {
         ProductDTO product = productService.createProduct(request, user.getId());
-        return ResponseEntity.status(201).body(product);
+        return ResponseFactory.created(product);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProductDTO> updateProduct(
+    public ResponseEntity<BaseResponse> updateProduct(
             @PathVariable Long id,
             @RequestBody UpdateProductRequest request) {
         ProductDTO product = productService.updateProduct(id, request);
-        return ResponseEntity.ok(product);
+        return ResponseFactory.success(product, "Cập nhật sản phẩm thành công");
     }
 
     @GetMapping("/searchProduct/{option}")
-    public ResponseEntity<List<ProductDTO>> searchProductByOption(@PathVariable String option) {
+    public ResponseEntity<BaseResponse> searchProductByOption(@PathVariable String option) {
         List<ProductDTO> products;
         if ("old".equals(option)) {
             products = productService.getAllProductsAdmin();
         } else {
             products = productService.getAllProductsAdmin();
         }
-        return ResponseEntity.ok(products);
+        return ResponseFactory.success(products);
     }
 
     @GetMapping("/searchHere/{q}")
-    public ResponseEntity<List<ProductDTO>> getProductsByCategory(@PathVariable Long q) {
+    public ResponseEntity<BaseResponse> getProductsByCategory(@PathVariable Long q) {
         List<ProductDTO> products = productService.getProductsByCategory(q);
-        return ResponseEntity.ok(products);
+        return ResponseFactory.success(products);
     }
-
-    // Migrated from NodeJS ProductRoutes
 }

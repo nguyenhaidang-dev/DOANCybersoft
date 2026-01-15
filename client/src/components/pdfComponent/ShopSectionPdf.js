@@ -35,10 +35,10 @@ const ShopSectionPdf = () => {
                     {products.map((product) => (
                       <div
                         className="shop col-lg-4 col-md-6 col-sm-6"
-                        key={product._id}
+                        key={product.id}
                       >
                         <div className="border-product">
-                          <Link to={`/pdf/${product._id}`}>
+                          <Link to={`/pdf/${product.id}`}>
                             <div className="shopBack">
                               <img src={product.image} alt={product.name} />
                             </div>
@@ -46,7 +46,7 @@ const ShopSectionPdf = () => {
 
                           <div className="shoptext">
                             <p>
-                              <Link to={`/pdf/${product._id}`}>
+                              <Link to={`/pdf/${product.id}`}>
                                 {product.name}
                               </Link>
                             </p>

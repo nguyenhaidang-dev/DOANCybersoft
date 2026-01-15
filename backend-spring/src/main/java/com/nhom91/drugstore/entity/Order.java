@@ -74,5 +74,4 @@ public class Order {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Migrated from NodeJS OrderModel with embedded arrays moved to separate tables
 }

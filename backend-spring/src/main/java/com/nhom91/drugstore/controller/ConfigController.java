@@ -1,5 +1,7 @@
 package com.nhom91.drugstore.controller;
 
+import com.nhom91.drugstore.response.BaseResponse;
+import com.nhom91.drugstore.utils.ResponseFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +18,8 @@ public class ConfigController {
     private String paypalClientId;
 
     @GetMapping("/paypal")
-    public ResponseEntity<Map<String, String>> getPaypalClientId() {
-        return ResponseEntity.ok(Map.of("clientId", paypalClientId));
+    public ResponseEntity<BaseResponse> getPaypalClientId() {
+        return ResponseFactory.success(Map.of("clientId", paypalClientId));
     }
 
-    // Migrated from NodeJS config endpoint
 }

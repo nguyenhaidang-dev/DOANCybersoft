@@ -27,14 +27,14 @@ const Product = (props) => {
             <div className="price mb-2">{product.price}VND</div>
             <div className="row">
               <Link
-                to={`/product/${product._id}/edit`}
+                to={`/product/${product.id}/edit`}
                 className="btn btn-sm btn-outline-success p-2 pb-3 col-md-6"
               >
                 <i className="fas fa-pen"></i>
               </Link>
               <Link
                 to="#"
-                onClick={() => deletehandler(product._id)}
+                onClick={() => deletehandler(product.id)}
                 className="btn btn-sm btn-outline-danger p-2 pb-3 col-md-6"
               >
                 <i className="fas fa-trash-alt"></i>

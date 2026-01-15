@@ -16,6 +16,4 @@ public class ProductReviewDTO {
     private String userName;
     private Long userId;
     private LocalDateTime createdAt;
-
-    // DTO for ProductReview responses
 }

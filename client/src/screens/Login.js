@@ -39,8 +39,8 @@ const Login = ({ location, history }) => {
           onSubmit={submitHandler}
         >
           <input
-            type="number"
-            placeholder="Số điện thoại"
+            type="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />

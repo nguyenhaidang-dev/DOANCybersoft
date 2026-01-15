@@ -40,5 +40,4 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // Migrated from embedded orderItems in NodeJS OrderModel
 }

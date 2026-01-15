@@ -30,5 +30,4 @@ public class PaymentResult {
     @Column(name = "email_address")
     private String emailAddress;
 
-    // Migrated from embedded paymentResult in NodeJS OrderModel
 }

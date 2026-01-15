@@ -1,26 +1,47 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/drugstore?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3307/drugstore?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
     username: root
-    password: root
+    password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
   security:
     enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ndat04913@gmail.com
+    password: wpyy zjfi jhhq cdcc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 jwt:
-  secret: yourSecretKeyHere
-  expiration: 86400000  # 24 hours in milliseconds
+  secret-key: wRX3rsm0Eh/nzsc2CLN1StaZ4/jWXnuCy450YxZQep0=
+  expiration: 86400000
+
+redis:
+  host: ${REDIS_HOST:localhost}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:Aa@123456}
+
+app:
+  name: Drugstore
+  url: http://localhost:3000
 
 paypal:
   client:
-    id: yourPaypalClientIdHere
+    id: AV0xw66zxFf6qyi_1UzGgle1Ux7wVKI06WkuFEhqRRw7omNu6ThSKSLcmCvChDGWmxAhY09txQFn2T56

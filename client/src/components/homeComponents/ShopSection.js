@@ -24,7 +24,7 @@ const ShopSection = (props) => {
     if (item) {
       const res = await axios.get(`/api/products/searchHere/${item}`);
       if (res.status === 200) {
-        setPr(res.data);
+        setPr(res.data.data || []);
       }
     } else {
       dispatch(listProduct(keyword, pagenumber));
@@ -58,10 +58,10 @@ const ShopSection = (props) => {
                     {pr.map((product) => (
                       <div
                         className="shop col-lg-4 col-md-6 col-sm-6"
-                        key={product._id}
+                        key={product.id}
                       >
                         <div className="border-product">
-                          <Link to={`/products/${product._id}`}>
+                          <Link to={`/products/${product.id}`}>
                             <div className="shopBack">
                               <img src={product.image} alt={product.name} />
                             </div>
@@ -69,7 +69,7 @@ const ShopSection = (props) => {
 
                           <div className="shoptext">
                             <p>
-                              <Link to={`/products/${product._id}`}>
+                              <Link to={`/products/${product.id}`}>
                                 {product.name} - {product.ma}
                               </Link>
                             </p>
@@ -104,10 +104,10 @@ const ShopSection = (props) => {
                     {products.map((product) => (
                       <div
                         className="shop col-lg-4 col-md-6 col-sm-6"
-                        key={product._id}
+                        key={product.id}
                       >
                         <div className="border-product">
-                          <Link to={`/products/${product._id}`}>
+                          <Link to={`/products/${product.id}`}>
                             <div className="shopBack">
                               <img src={product.image} alt={product.name} />
                             </div>
@@ -115,7 +115,7 @@ const ShopSection = (props) => {
 
                           <div className="shoptext">
                             <p>
-                              <Link to={`/products/${product._id}`}>
+                              <Link to={`/products/${product.id}`}>
                                 {product.name} - {product.ma}
                               </Link>
                             </p>

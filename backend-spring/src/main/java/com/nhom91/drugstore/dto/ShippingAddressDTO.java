@@ -13,6 +13,4 @@ public class ShippingAddressDTO {
     private String city;
     private String postalCode;
     private String country;
-
-    // DTO for ShippingAddress responses
 }

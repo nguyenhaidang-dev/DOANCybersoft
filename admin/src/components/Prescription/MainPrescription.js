@@ -231,7 +231,7 @@ const MainPrescription = () => {
                           <div className="row">
                             <div
                               onClick={() => handleAddOrder(item)}
-                              // to={`/product/${product._id}/edit`}
+                              // to={`/product/${product.id}/edit`}
                               className="btn btn-sm btn-outline-success p-2 pb-3 col-md-6 w-100"
                             >
                               <i class="fas fa-plus"></i>
@@ -260,7 +260,7 @@ const MainPrescription = () => {
                           <div className="row">
                             <Link
                               onClick={() => handleAddOrder(item)}
-                              // to={`/product/${product._id}/edit`}
+                              // to={`/product/${product.id}/edit`}
                               className="btn btn-sm btn-outline-success p-2 pb-3 col-md-6 w-100"
                             >
                               <i class="fas fa-plus"></i>

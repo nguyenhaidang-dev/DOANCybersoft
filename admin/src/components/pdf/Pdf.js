@@ -24,7 +24,7 @@ const Pdf = (props) => {
     <>
       <div className="col-md-6 col-sm-6 col-lg-3 mb-5">
         <div className="card card-product-grid shadow-sm">
-          <Link to={`/showpdf/${product._id}`} className="img-wrap">
+          <Link to={`/showpdf/${product.id}`} className="img-wrap">
             <img src={product.image} alt="Product" />
           </Link>
           <div className="info-wrap">
@@ -33,14 +33,14 @@ const Pdf = (props) => {
             </Link>
             <div className="row">
               <Link
-                to={`/pdfs/${product._id}/edit`}
+                to={`/pdfs/${product.id}/edit`}
                 className="btn btn-sm btn-outline-success p-2 pb-3 col-md-6"
               >
                 <i className="fas fa-pen"></i>
               </Link>
               <Link
                 to="#"
-                onClick={() => deletehandler(product._id)}
+                onClick={() => deletehandler(product.id)}
                 className="btn btn-sm btn-outline-danger p-2 pb-3 col-md-6"
               >
                 <i className="fas fa-trash-alt"></i>

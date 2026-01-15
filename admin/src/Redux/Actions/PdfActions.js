@@ -162,7 +162,7 @@ export const updatePdf = (product) => async (dispatch, getState) => {
     };
 
     const { data } = await axios.put(
-      `${URL}/api/pdf/${product._id}`,
+      `${URL}/api/pdf/${product.id}`,
       product,
       config
     );

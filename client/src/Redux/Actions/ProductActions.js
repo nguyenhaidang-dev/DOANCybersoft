@@ -24,7 +24,9 @@ export const listProduct =
       const { data } = await axios.get(
         `/api/products?keyword=${keyword}&pageNumber=${pageNumber}`
       );
-      dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
+      // Extract products data from BaseResponse wrapper
+      const productsData = data.data;
+      dispatch({ type: PRODUCT_LIST_SUCCESS, payload: productsData });
     } catch (error) {
       dispatch({
         type: PRODUCT_LIST_FAIL,
@@ -40,7 +42,9 @@ export const listSearch = (type) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_LIST_SEARCH_REQUEST });
     const { data } = await axios.get(`/api/products/search/${type}`);
-    dispatch({ type: PRODUCT_LIST_SEARCH_SUCCESS, payload: data });
+    // Extract products data from BaseResponse wrapper
+    const productsData = data.data;
+    dispatch({ type: PRODUCT_LIST_SEARCH_SUCCESS, payload: productsData });
   } catch (error) {
     dispatch({
       type: PRODUCT_LIST_SEARCH_FAIL,
@@ -57,7 +61,9 @@ export const listProductDetails = (id) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_DETAILS_REQUEST });
     const { data } = await axios.get(`/api/products/${id}`);
-    dispatch({ type: PRODUCT_DETAILS_SUCCESS, payload: data });
+    // Extract product data from BaseResponse wrapper
+    const productData = data.data;
+    dispatch({ type: PRODUCT_DETAILS_SUCCESS, payload: productData });
   } catch (error) {
     dispatch({
       type: PRODUCT_DETAILS_FAIL,

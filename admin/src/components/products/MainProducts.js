@@ -107,10 +107,10 @@ const MainProducts = () => {
               {/* Products */}
               {isSearch == 0
                 ? products.map((product) => (
-                    <Product product={product} key={product._id} />
+                    <Product product={product} key={product.id} />
                   ))
                 : data.map((product) => (
-                    <Product product={product} key={product._id} />
+                    <Product product={product} key={product.id} />
                   ))}
             </div>
           )}

@@ -64,5 +64,4 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Migrated from NodeJS ProductModel with embedded reviews moved to separate table
 }

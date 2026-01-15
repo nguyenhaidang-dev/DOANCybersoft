@@ -1,11 +1,13 @@
 package com.nhom91.drugstore.controller;
 
-import com.nhom91.drugstore.dto.CreatePdfRequest;
+import com.nhom91.drugstore.request.CreatePdfRequest;
 import com.nhom91.drugstore.dto.PdfDTO;
-import com.nhom91.drugstore.dto.PdfReviewRequest;
-import com.nhom91.drugstore.dto.UpdatePdfRequest;
+import com.nhom91.drugstore.request.PdfReviewRequest;
+import com.nhom91.drugstore.request.UpdatePdfRequest;
 import com.nhom91.drugstore.entity.User;
+import com.nhom91.drugstore.response.BaseResponse;
 import com.nhom91.drugstore.service.PdfService;
+import com.nhom91.drugstore.utils.ResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pdf")
@@ -24,56 +25,54 @@ public class PdfController {
     private final PdfService pdfService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<PdfDTO>> getAllPdfs() {
+    public ResponseEntity<BaseResponse> getAllPdfs() {
         List<PdfDTO> pdfs = pdfService.getAllPdfs();
-        return ResponseEntity.ok(pdfs);
+        return ResponseFactory.success(pdfs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PdfDTO> getPdfById(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> getPdfById(@PathVariable Long id) {
         PdfDTO pdf = pdfService.getPdfById(id);
-        return ResponseEntity.ok(pdf);
+        return ResponseFactory.success(pdf);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Map<String, String>> deletePdf(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> deletePdf(@PathVariable Long id) {
         pdfService.deletePdf(id);
-        return ResponseEntity.ok(Map.of("message", "Pdf deleted"));
+        return ResponseFactory.successMessage("Xóa PDF thành công");
     }
 
     @GetMapping("/searchpdf/{type}")
-    public ResponseEntity<List<PdfDTO>> searchPdfs(@PathVariable String type) {
+    public ResponseEntity<BaseResponse> searchPdfs(@PathVariable String type) {
         List<PdfDTO> pdfs = pdfService.searchPdfs(type);
-        return ResponseEntity.ok(pdfs);
+        return ResponseFactory.success(pdfs);
     }
 
     @PostMapping("/{id}/review")
-    public ResponseEntity<Map<String, String>> addPdfReview(
+    public ResponseEntity<BaseResponse> addPdfReview(
             @PathVariable Long id,
             @Valid @RequestBody PdfReviewRequest request,
             @AuthenticationPrincipal User user) {
         pdfService.addPdfReview(id, request, user);
-        return ResponseEntity.status(201).body(Map.of("message", "Review added"));
+        return ResponseFactory.successMessage("Đánh giá đã được thêm");
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PdfDTO> createPdf(
+    public ResponseEntity<BaseResponse> createPdf(
             @Valid @RequestBody CreatePdfRequest request,
             @AuthenticationPrincipal User user) {
         PdfDTO pdf = pdfService.createPdf(request, user.getId());
-        return ResponseEntity.status(201).body(pdf);
+        return ResponseFactory.created(pdf);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PdfDTO> updatePdf(
+    public ResponseEntity<BaseResponse> updatePdf(
             @PathVariable Long id,
             @RequestBody UpdatePdfRequest request) {
         PdfDTO pdf = pdfService.updatePdf(id, request);
-        return ResponseEntity.ok(pdf);
+        return ResponseFactory.success(pdf, "Cập nhật PDF thành công");
     }
-
-    // Migrated from NodeJS PdfRoutes
 }

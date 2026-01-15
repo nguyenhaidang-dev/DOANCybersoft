@@ -1,7 +1,13 @@
 package com.nhom91.drugstore.controller;
 
 import com.nhom91.drugstore.dto.*;
+import com.nhom91.drugstore.request.CreateBannerRequest;
+import com.nhom91.drugstore.request.CreateCategoryRequest;
+import com.nhom91.drugstore.request.UpdateBannerRequest;
+import com.nhom91.drugstore.request.UpdateCategoryRequest;
+import com.nhom91.drugstore.response.BaseResponse;
 import com.nhom91.drugstore.service.CategoryService;
+import com.nhom91.drugstore.utils.ResponseFactory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,90 +24,88 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+    public ResponseEntity<BaseResponse> getAllCategories() {
         List<CategoryDTO> categories = categoryService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseFactory.success(categories);
     }
 
     @GetMapping("/all/status")
-    public ResponseEntity<List<CategoryDTO>> getAllCategoriesWithShow() {
+    public ResponseEntity<BaseResponse> getAllCategoriesWithShow() {
         List<CategoryDTO> categories = categoryService.getAllCategoriesWithShow();
-        return ResponseEntity.ok(categories);
+        return ResponseFactory.success(categories);
     }
 
     @GetMapping("/all/status/no")
-    public ResponseEntity<List<CategoryDTO>> getAllChildCategories() {
+    public ResponseEntity<BaseResponse> getAllChildCategories() {
         List<CategoryDTO> categories = categoryService.getAllChildCategories();
-        return ResponseEntity.ok(categories);
+        return ResponseFactory.success(categories);
     }
 
     @GetMapping("/all/status-detail/{id}")
-    public ResponseEntity<List<CategoryDTO>> getChildCategoriesByParent(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> getChildCategoriesByParent(@PathVariable String id) {
         List<CategoryDTO> categories = categoryService.getChildCategoriesByParent(id);
-        return ResponseEntity.ok(categories);
+        return ResponseFactory.success(categories);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> getCategoryById(@PathVariable Long id) {
         CategoryDTO category = categoryService.getCategoryById(id);
-        return ResponseEntity.ok(category);
+        return ResponseFactory.success(category);
     }
 
     @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
+    public ResponseEntity<BaseResponse> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
         CategoryDTO category = categoryService.createCategory(request);
-        return ResponseEntity.status(201).body(category);
+        return ResponseFactory.created(category);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteCategory(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.ok(Map.of("message", "Category deleted"));
+        return ResponseFactory.successMessage("Xóa danh mục thành công");
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(@PathVariable Long id, @RequestBody UpdateCategoryRequest request) {
+    public ResponseEntity<BaseResponse> updateCategory(@PathVariable Long id, @RequestBody UpdateCategoryRequest request) {
         CategoryDTO category = categoryService.updateCategory(id, request);
-        return ResponseEntity.ok(category);
+        return ResponseFactory.success(category, "Cập nhật danh mục thành công");
     }
 
     @PutMapping("/status/{id}")
-    public ResponseEntity<CategoryDTO> updateCategoryStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+    public ResponseEntity<BaseResponse> updateCategoryStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
         Boolean isShow = body.get("isShow");
         CategoryDTO category = categoryService.updateCategoryStatus(id, isShow);
-        return ResponseEntity.ok(category);
+        return ResponseFactory.success(category, "Cập nhật trạng thái thành công");
     }
 
     // Banner endpoints
     @GetMapping("/banner-detail/{detailId}")
-    public ResponseEntity<BannerDTO> getBannerById(@PathVariable Long detailId) {
+    public ResponseEntity<BaseResponse> getBannerById(@PathVariable Long detailId) {
         BannerDTO banner = categoryService.getBannerById(detailId);
-        return ResponseEntity.ok(banner);
+        return ResponseFactory.success(banner);
     }
 
     @GetMapping("/all/banner")
-    public ResponseEntity<List<BannerDTO>> getAllBanners() {
+    public ResponseEntity<BaseResponse> getAllBanners() {
         List<BannerDTO> banners = categoryService.getAllBanners();
-        return ResponseEntity.ok(banners);
+        return ResponseFactory.success(banners);
     }
 
     @PostMapping("/banner")
-    public ResponseEntity<BannerDTO> createBanner(@Valid @RequestBody CreateBannerRequest request) {
+    public ResponseEntity<BaseResponse> createBanner(@Valid @RequestBody CreateBannerRequest request) {
         BannerDTO banner = categoryService.createBanner(request);
-        return ResponseEntity.status(200).body(banner);
+        return ResponseFactory.success(banner, "Tạo banner thành công");
     }
 
     @PutMapping("/banner/{id}")
-    public ResponseEntity<BannerDTO> updateBanner(@PathVariable Long id, @RequestBody UpdateBannerRequest request) {
+    public ResponseEntity<BaseResponse> updateBanner(@PathVariable Long id, @RequestBody UpdateBannerRequest request) {
         BannerDTO banner = categoryService.updateBanner(id, request);
-        return ResponseEntity.ok(banner);
+        return ResponseFactory.success(banner, "Cập nhật banner thành công");
     }
 
     @DeleteMapping("/banner/delete/{id}")
-    public ResponseEntity<Map<String, String>> deleteBanner(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse> deleteBanner(@PathVariable Long id) {
         categoryService.deleteBanner(id);
-        return ResponseEntity.ok(Map.of("message", "Banner deleted"));
+        return ResponseFactory.successMessage("Xóa banner thành công");
     }
-
-    // Migrated from NodeJS categoryRoutes
 }

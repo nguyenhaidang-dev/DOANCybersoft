@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PdfRepository extends JpaRepository<Pdf, Long> {
-    // Migrated from Mongoose Pdf.find in NodeJS
 }

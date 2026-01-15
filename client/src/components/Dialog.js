@@ -23,10 +23,12 @@ const Dialog = ({ idParent, isOpenDialog, setCloseDialog, onClickOpen }) => {
         `/api/category/all/status-detail/${idParent}`
       );
       if (res.status === 200) {
-        setListItem(res.data);
+        // Extract categories data from BaseResponse wrapper
+        setListItem(res.data.data || []);
       }
     } catch (error) {
-      console.log("Fetch fails");
+      console.error("Error fetching categories:", error);
+      setListItem([]);
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ const Dialog = ({ idParent, isOpenDialog, setCloseDialog, onClickOpen }) => {
                     <li
                       key={index}
                       class="menu-item-con item-dialog"
-                      onClick={() => redirectPage(o._id)}
+                      onClick={() => redirectPage(o.id || o._id)}
                     >
                       {o.name}
                     </li>

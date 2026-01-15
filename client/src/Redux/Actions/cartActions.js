@@ -9,16 +9,19 @@ import {
 // ADD TO CART
 export const addToCart = (id, qty, typePay) => async (dispatch, getState) => {
   const { data } = await axios.get(`/api/products/${id}`);
+  
+  // Extract product data from BaseResponse wrapper
+  const productData = data.data;
 
   dispatch({
     type: CART_ADD_ITEM,
     payload: {
-      product: data._id,
-      name: data.name,
-      image: data.image,
-      price: data.price,
-      countInStock: data.countInStock,
-      loanPrice: data.loanPrice,
+      product: productData.id,
+      name: productData.name,
+      image: productData.image,
+      price: productData.price,
+      countInStock: productData.countInStock,
+      loanPrice: productData.loanPrice,
       typePay: typePay,
       qty,
     },

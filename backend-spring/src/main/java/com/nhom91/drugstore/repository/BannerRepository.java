@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BannerRepository extends JpaRepository<Banner, Long> {
-    // Migrated from Mongoose Banner.find in NodeJS
 }

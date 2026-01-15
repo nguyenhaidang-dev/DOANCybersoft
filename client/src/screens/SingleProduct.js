@@ -56,34 +56,34 @@ const SingleProduct = ({ history, match }) => {
       toast.error('Sản Phẩm này thuộc vào phần kê đơn');
       return;
     }
-// console.log(productDetails);
+    // console.log(productDetails);
     history.push(`/cart/${productId}?qty=${qty}`);
   };
 
   const AddToFavoriteHandle = () => {
     const store = JSON.parse(localStorage.getItem('favorite'));
     let obj = {
-      id: product._id,
+      id: product.id,
       name: product.name,
       img: product.image,
       price: product.price,
       quantity: 1
     }
 
-    if (store) {      
+    if (store) {
       const listStore = JSON.parse(localStorage.getItem('favorite'));
       const a = [...listStore];
-      const exits = a.find(item => item.id == product._id);
+      const exits = a.find(item => item.id == product.id);
       if (exits) {
         toast.error('Danh sách yêu thích đã tồn tại')
       } else {
         a.push(obj)
-        localStorage.setItem('favorite',JSON.stringify(a));
+        localStorage.setItem('favorite', JSON.stringify(a));
       }
-    }else{
+    } else {
       const a = [];
       a.push(obj)
-      localStorage.setItem('favorite',JSON.stringify(a));
+      localStorage.setItem('favorite', JSON.stringify(a));
     }
     history.push(`/favorite`);
   }
@@ -118,12 +118,12 @@ const SingleProduct = ({ history, match }) => {
               <div className="col-md-6">
                 <div className="single-image">
                   <img src={product.image} alt={product.name} />
-                  <i className={`fas fa-heart heart ${listStore.find(item => item.id == product._id) ? 'bg-red': ''}`} onClick={AddToFavoriteHandle}></i>
+                  <i className={`fas fa-heart heart ${listStore.find(item => item.id == product.id) ? 'bg-red' : ''}`} onClick={AddToFavoriteHandle}></i>
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="product-dtl">
-                      <div className="product-info">                      
+                  <div className="product-info">
                     <div className="product-name">{product.name}</div>
                   </div>
                   <p>{product.description}</p>
@@ -142,9 +142,9 @@ const SingleProduct = ({ history, match }) => {
                     <div className="flex-box d-flex justify-content-between align-items-center">
                       <h6>Trạng thái</h6>
                       {product.countInStock > 0 ? (
-                       <>
-                        <span>Số lượng tồn kho</span> <span style={{color:'red'}}>{product.countInStock}</span>
-                       </>
+                        <>
+                          <span>Số lượng tồn kho</span> <span style={{ color: 'red' }}>{product.countInStock}</span>
+                        </>
                       ) : (
                         <span>Hết hàng</span>
                       )}
@@ -178,7 +178,7 @@ const SingleProduct = ({ history, match }) => {
                           className="round-black-btn"
                         >
                           Thanh toán
-                            </button>                                                      
+                        </button>
                       </>
                     ) : null}
                   </div>

@@ -30,6 +30,4 @@ public class ShippingAddress {
 
     @Column(nullable = false)
     private String country;
-
-    // Migrated from embedded shippingAddress in NodeJS OrderModel
 }

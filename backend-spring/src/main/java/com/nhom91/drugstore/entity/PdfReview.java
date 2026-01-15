@@ -36,5 +36,4 @@ public class PdfReview {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    // Migrated from embedded reviews in NodeJS PdfModel
 }

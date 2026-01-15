@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Header from "./../components/Header";
 import { PayPalButton } from "react-paypal-button-v2";
@@ -20,53 +20,114 @@ const OrderScreen = ({ match }) => {
   const { order, loading, error } = orderDetails;
   const orderPay = useSelector((state) => state.orderPay);
   const { loading: loadingPay, success: successPay } = orderPay;
+  const userLogin = useSelector((state) => state.userLogin);
 
-  if (!loading) {
+  // Calculate itemsPrice without mutating order object
+  const calculatedItemsPrice = useMemo(() => {
+    if (!order || !order.orderItems) return 0;
+    
     const addDecimals = (num) => {
       return Math.round(num * 100) / 100;
     };
 
     if (order.typePay === "loan") {
-      order.itemsPrice = addDecimals(
+      return addDecimals(
         order.orderItems.reduce(
-          (acc, item) => acc + item.loanPrice * item.qty,
+          (acc, item) => acc + (item.loanPrice || 0) * item.qty,
           0
         )
       );
     } else {
-      order.itemsPrice = addDecimals(
+      return addDecimals(
         order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
       );
     }
-  }
+  }, [order]);
+
+  // Use calculated price or fallback to order.itemsPrice
+  const displayItemsPrice = calculatedItemsPrice || order?.itemsPrice || 0;
+
+  useEffect(() => {
+    const numericOrderId = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
+    
+    if (isNaN(numericOrderId)) {
+      return;
+    }
+    
+    const currentOrderId = order?.id ? (typeof order.id === 'string' ? parseInt(order.id, 10) : order.id) : null;
+    const shouldLoadOrder = !order || !currentOrderId || currentOrderId !== numericOrderId;
+    
+    if (shouldLoadOrder) {
+      dispatch({ type: "ORDER_DETAILS_REQUEST" });
+      dispatch(getOrderDetails(numericOrderId));
+    }
+  }, [dispatch, orderId]);
 
   useEffect(() => {
     const addPayPalScript = async () => {
-      const { data: clientId } = await axios.get("/api/config/paypal");
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
-      script.async = true;
-      script.onload = () => {
+      try {
+        const { data } = await axios.get("/api/config/paypal");
+        const configData = data.data;
+        const clientId = configData.clientId;
+        
+        if (!clientId || clientId === "yourPaypalClientIdHere" || clientId.trim() === "") {
+          setSdkReady(true);
+          return;
+        }
+        
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`;
+        script.async = true;
+        script.onload = () => {
+          setSdkReady(true);
+        };
+        script.onerror = () => {
+          setSdkReady(true);
+        };
+        document.body.appendChild(script);
+      } catch (error) {
         setSdkReady(true);
-      };
-      document.body.appendChild(script);
+      }
     };
-    if (!order || successPay) {
-      dispatch({ type: ORDER_PAY_RESET });
-      dispatch(getOrderDetails(orderId));
-    } else if (!order.isPaid) {
-      if (!window.paypal) {
-        addPayPalScript();
-      } else {
-        setSdkReady(true);
+    
+    if (order && order.id) {
+      const numericOrderId = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
+      
+      if (order.id === numericOrderId || order.id.toString() === orderId.toString()) {
+        if (!order.isPaid) {
+          const paymentMethod = (order.paymentMethod || "").toLowerCase();
+          if (paymentMethod === "paypal") {
+            if (!window.paypal) {
+              addPayPalScript();
+            } else {
+              setSdkReady(true);
+            }
+          } else {
+            setSdkReady(true);
+          }
+        }
       }
     }
   }, [dispatch, orderId, successPay, order]);
 
   const successPaymentHandler = (paymentResult) => {
-    dispatch(payOrder(orderId, paymentResult));
+    const numericOrderId = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
+    
+    if (isNaN(numericOrderId)) {
+      alert("Lỗi: Order ID không hợp lệ. Vui lòng thử lại.");
+      return;
+    }
+    
+    dispatch(payOrder(numericOrderId, paymentResult));
   };
+
+  useEffect(() => {
+    if (successPay) {
+      dispatch({ type: ORDER_PAY_RESET });
+      dispatch(getOrderDetails(orderId));
+    }
+  }, [dispatch, orderId, successPay]);
 
   const renderPrice = (qty, price, loanPrice, typePay) => {
     let prices = price * qty;
@@ -85,17 +146,65 @@ const OrderScreen = ({ match }) => {
   };
 
   const handleReceive = async () => {
-    const URL = 'http://localhost:5000';
-    const { data } = await axios.put(
-      `${URL}/api/orders/${order._id}/delivered`,
-      { status: 'dahoanthanh' }
-    );
-    if (data) {
-      window.location.reload();
+    try {
+      if (!userLogin || !userLogin.userInfo) {
+        alert("Vui lòng đăng nhập để xác nhận nhận hàng.");
+        return;
       }
-  }
 
-  console.log(order);
+      const { userInfo } = userLogin;
+      
+      if (!userInfo || !userInfo.token) {
+        alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        return;
+      }
+      
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      
+      // Use Spring Boot API endpoint and correct field name
+      const currentOrderId = order?.id || order?._id;
+      if (!currentOrderId) {
+        alert("Không tìm thấy thông tin đơn hàng.");
+        return;
+      }
+
+      const { data } = await axios.put(
+        `/api/orders/${currentOrderId}/delivered`,
+        { status: 'dahoanthanh' },
+        config
+      );
+      
+      const orderData = data.data;
+      
+      if (orderData) {
+        dispatch(getOrderDetails(currentOrderId));
+      } else {
+        dispatch(getOrderDetails(currentOrderId));
+      }
+    } catch (error) {
+      
+      let errorMessage = "Có lỗi xảy ra khi cập nhật trạng thái. Vui lòng thử lại.";
+      
+      if (error.response) {
+        // Extract error message from BaseResponse wrapper
+        const errorData = error.response.data;
+        if (errorData && errorData.message) {
+          errorMessage = errorData.message;
+        } else if (errorData && errorData.data && errorData.data.message) {
+          errorMessage = errorData.data.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage);
+    }
+  }
 
   return (
     <>
@@ -247,7 +356,7 @@ const OrderScreen = ({ match }) => {
                       <td>
                         <strong>Sản phẩm</strong>
                       </td>
-                      <td>{showPrice(order.itemsPrice)}</td>
+                      <td>{showPrice(displayItemsPrice)}</td>
                     </tr>
                     <tr>
                       <td>
@@ -269,23 +378,64 @@ const OrderScreen = ({ match }) => {
                     </tr>
                   </tbody>
                 </table>
-                {!order.isPaid && (
-                  <div className="col-12">
-                    {loadingPay && <Loading />}
-                    {!sdkReady ? (
-                      <Loading />
-                    ) : (
-                      <PayPalButton
-                        amount={order.totalPrice}
-                        onSuccess={successPaymentHandler}
-                      />
-                    )}
-                  </div>
-                    )}
+                {!order.isPaid && (() => {
+                  // Normalize payment method for comparison (case-insensitive)
+                  const paymentMethod = (order.paymentMethod || "").toLowerCase();
+                  if (paymentMethod === "paypal") {
+                    // Check if PayPal Client ID is configured
+                    const paypalClientId = order.paymentMethod === "Paypal" ? 
+                      (localStorage.getItem("paypalClientId") || "") : "";
+                    
+                    return (
+                      <div className="col-12">
+                        {loadingPay && <Loading />}
+                        {!sdkReady ? (
+                          <Loading />
+                        ) : window.paypal ? (
+                          <PayPalButton
+                            amount={order.totalPrice}
+                            onSuccess={successPaymentHandler}
+                          />
+                        ) : (
+                          <div className="bg-warning p-2 text-center">
+                            <p className="text-white mb-0">
+                              PayPal chưa được cấu hình. Vui lòng liên hệ admin hoặc chọn "Thanh toán khi nhận hàng".
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="col-12">
+                        <div className="bg-warning p-2 text-center">
+                          <p className="text-white mb-0">
+                            Đơn hàng sẽ được thanh toán khi nhận hàng
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                })()}
                     {
-                      order.isPaid && !order.isDelivered  && (
-                        <div className="bg-info p-2" style={{ color: 'white', cursor : 'pointer' }} onClick={handleReceive}>
-                          Đã Nhận Được Hàng
+                      order.isPaid && !order.isDelivered && (
+                        <div className="bg-warning p-3 text-center" style={{ cursor: 'pointer', borderRadius: '5px' }} onClick={handleReceive}>
+                          <i className="fas fa-check-circle me-2"></i>
+                          <strong>Xác nhận đã nhận hàng</strong>
+                          <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
+                            Nhấn vào đây khi bạn đã nhận được hàng
+                          </p>
+                        </div>
+                      )
+                    }
+                    {
+                      order.isPaid && order.isDelivered && (
+                        <div className="bg-success p-3 text-center" style={{ borderRadius: '5px' }}>
+                          <i className="fas fa-check-double me-2"></i>
+                          <strong>Đã nhận hàng</strong>
+                          <p className="mb-0 mt-1" style={{ fontSize: '0.9rem' }}>
+                            {order.deliveredAt ? `Ngày nhận: ${moment(order.deliveredAt).format('DD/MM/YYYY HH:mm')}` : ''}
+                          </p>
                         </div>
                       )
                     }

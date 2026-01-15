@@ -40,10 +40,10 @@ const ShopSearchSection = () => {
                     {products.map((product) => (
                       <div
                         className="shop col-lg-4 col-md-6 col-sm-6"
-                        key={product._id}
+                        key={product.id}
                       >
                         <div className="border-product">
-                          <Link to={`/products/${product._id}`}>
+                          <Link to={`/products/${product.id}`}>
                             <div className="shopBack">
                               <img src={product.image} alt={product.name} />
                             </div>
@@ -51,7 +51,7 @@ const ShopSearchSection = () => {
 
                           <div className="shoptext">
                             <p>
-                              <Link to={`/products/${product._id}`}>
+                              <Link to={`/products/${product.id}`}>
                                 {product.name}
                               </Link>
                             </p>

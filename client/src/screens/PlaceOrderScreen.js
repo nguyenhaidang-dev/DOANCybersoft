@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { createOrder } from "../Redux/Actions/OrderActions";
@@ -15,73 +15,129 @@ const PlaceOrderScreen = ({ history }) => {
 
   const { userInfo } = userLogin;
   const typePay = localStorage.getItem("typePay");
-  const pay = JSON.parse(localStorage.getItem("paymentMethod"));
+  const payRaw = localStorage.getItem("paymentMethod");
+  const pay = payRaw ? JSON.parse(payRaw) : "Paypal"; // Default to Paypal if not set
 
-  // Calculate Price
   const addDecimals = (num) => {
     return Math.round(num * 100) / 100;
   };
 
-  if (typePay === "buy") {
-    cart.itemsPrice = addDecimals(
-      cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-    );
-    cart.shippingPrice = addDecimals(cart.itemsPrice > 100 ? 0 : 100);
-    cart.taxPrice = addDecimals(Number(0.15 * cart.itemsPrice));
-    cart.totalPrice =
-      Number(cart.itemsPrice) +
-      Number(cart.shippingPrice) +
-      Number(cart.taxPrice);
-  } else if (typePay === "loan") {
-    cart.itemsLoanPrice = addDecimals(
-      cart.cartItems.reduce((acc, item) => acc + item.loanPrice * item.qty, 0)
-    );
-    cart.shippingLoanPrice = addDecimals(cart.itemsLoanPrice > 100 ? 0 : 100);
-    cart.taxLoanPrice = addDecimals(Number(0.15 * cart.itemsLoanPrice));
-    cart.totalLoanPrice =
-      Number(cart.itemsLoanPrice) +
-      Number(cart.shippingLoanPrice) +
-      Number(cart.taxLoanPrice);
-  }
+  const calculatePrices = useMemo(() => {
+    if (!cart.cartItems || cart.cartItems.length === 0) {
+      return {
+        itemsPrice: 0,
+        shippingPrice: 0,
+        taxPrice: 0,
+        totalPrice: 0,
+        itemsLoanPrice: 0,
+        shippingLoanPrice: 0,
+        taxLoanPrice: 0,
+        totalLoanPrice: 0,
+      };
+    }
+
+    if (typePay === "buy") {
+      const itemsPrice = addDecimals(
+        cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
+      );
+      const shippingPrice = addDecimals(itemsPrice > 100 ? 0 : 100);
+      const taxPrice = addDecimals(Number(0.15 * itemsPrice));
+      const totalPrice = Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice);
+      
+      return {
+        itemsPrice,
+        shippingPrice,
+        taxPrice,
+        totalPrice,
+        itemsLoanPrice: 0,
+        shippingLoanPrice: 0,
+        taxLoanPrice: 0,
+        totalLoanPrice: 0,
+      };
+    } else if (typePay === "loan") {
+      const itemsLoanPrice = addDecimals(
+        cart.cartItems.reduce((acc, item) => acc + (item.loanPrice || 0) * item.qty, 0)
+      );
+      const shippingLoanPrice = addDecimals(itemsLoanPrice > 100 ? 0 : 100);
+      const taxLoanPrice = addDecimals(Number(0.15 * itemsLoanPrice));
+      const totalLoanPrice = Number(itemsLoanPrice) + Number(shippingLoanPrice) + Number(taxLoanPrice);
+      
+      return {
+        itemsPrice: 0,
+        shippingPrice: 0,
+        taxPrice: 0,
+        totalPrice: 0,
+        itemsLoanPrice,
+        shippingLoanPrice,
+        taxLoanPrice,
+        totalLoanPrice,
+      };
+    }
+    
+    return {
+      itemsPrice: 0,
+      shippingPrice: 0,
+      taxPrice: 0,
+      totalPrice: 0,
+      itemsLoanPrice: 0,
+      shippingLoanPrice: 0,
+      taxLoanPrice: 0,
+      totalLoanPrice: 0,
+    };
+  }, [cart.cartItems, typePay]);
+
+  const prices = calculatePrices;
 
   const orderCreate = useSelector((state) => state.orderCreate);
   const { order, success, error } = orderCreate;
 
   useEffect(() => {
-    if (success) {
-      history.push(`/order/${order._id}`);
-      dispatch({ type: ORDER_CREATE_RESET });
+    if (success && order) {
+      const orderId = order.id || order._id;
+      if (orderId) {
+        dispatch({ type: ORDER_CREATE_RESET });
+        history.push(`/order/${orderId}`);
+      }
     }
   }, [history, dispatch, success, order]);
 
   let carts = JSON.parse(localStorage.getItem("cartItems"));
 
   const placeOrderHandler = (type) => {
+    const transformedOrderItems = cart.cartItems.map(item => ({
+      name: item.name,
+      qty: item.qty,
+      image: item.image,
+      price: item.price,
+      loanPrice: item.loanPrice || 0,
+      product: typeof item.product === 'string' ? parseInt(item.product) : item.product,
+    }));
+
     if (type === "loan") {
       dispatch(
         createOrder({
-          orderItems: cart.cartItems,
+          orderItems: transformedOrderItems,
           shippingAddress: cart.shippingAddress,
           paymentMethod: pay === "Credit" ? "Credit" : "Paypal",
-          itemsPrice: cart.itemsLoanPrice,
-          shippingPrice: cart.shippingLoanPrice,
-          taxPrice: cart.taxLoanPrice,
-          totalPrice: cart.totalLoanPrice,
-          isPaid: pay == "PayPal" ? false : true,
+          itemsPrice: prices.itemsLoanPrice,
+          shippingPrice: prices.shippingLoanPrice,
+          taxPrice: prices.taxLoanPrice,
+          totalPrice: prices.totalLoanPrice,
+          isPaid: (pay && pay.toLowerCase() === "credit") ? true : false, // Credit = paid on delivery, Paypal = not paid yet
           typePay: "loan",
         })
       );
     } else {
       dispatch(
         createOrder({
-          orderItems: cart.cartItems,
+          orderItems: transformedOrderItems,
           shippingAddress: cart.shippingAddress,
           paymentMethod: pay === "Credit" ? "Credit" : "Paypal",
-          itemsPrice: cart.itemsPrice,
-          shippingPrice: cart.shippingPrice,
-          taxPrice: cart.taxPrice,
-          totalPrice: cart.totalPrice,
-          isPaid: pay == "PayPal" ? false : true,
+          itemsPrice: prices.itemsPrice,
+          shippingPrice: prices.shippingPrice,
+          taxPrice: prices.taxPrice,
+          totalPrice: prices.totalPrice,
+          isPaid: (pay && pay.toLowerCase() === "credit") ? true : false, // Credit = paid on delivery, Paypal = not paid yet
           typePay: "buy",
         })
       );
@@ -144,9 +200,9 @@ const PlaceOrderScreen = ({ history }) => {
                 <p>Shipping: {cart.shippingAddress.country}</p>
                 <p>
                   Hình thức thanh toán:{" "}
-                  {cart.paymentMethod === "Credit"
+                  {(pay || cart.paymentMethod) === "Credit"
                     ? "Thanh toán khi nhận hàng"
-                    : "Paypal"}
+                    : "Paypal hoặc thẻ tín dụng / thẻ ghi nợ"}
                 </p>
               </div>
             </div>
@@ -224,25 +280,25 @@ const PlaceOrderScreen = ({ history }) => {
                   <td>
                     <strong>Sản phẩm</strong>
                   </td>
-                  <td>{showPrice(cart.itemsPrice)}</td>
+                  <td>{showPrice(typePay === "buy" ? prices.itemsPrice : prices.itemsLoanPrice)}</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Shipping</strong>
                   </td>
-                  <td>{showPrice(cart.shippingPrice)} </td>
+                  <td>{showPrice(typePay === "buy" ? prices.shippingPrice : prices.shippingLoanPrice)} </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Thuế</strong>
                   </td>
-                  <td>{showPrice(cart.taxPrice)}</td>
+                  <td>{showPrice(typePay === "buy" ? prices.taxPrice : prices.taxLoanPrice)}</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Tổng</strong>
                   </td>
-                  <td>{showPrice(cart.totalPrice)}</td>
+                  <td>{showPrice(typePay === "buy" ? prices.totalPrice : prices.totalLoanPrice)}</td>
                 </tr>
               </tbody>
             </table>

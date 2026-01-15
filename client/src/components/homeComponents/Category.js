@@ -14,13 +14,12 @@ const Category = () => {
     return new Promise(async () => {
       const res = await axios.get("/api/category/all/status");
       if (res.status === 200) {
-        setListCategory(res.data);
+        setListCategory(res.data.data || []);
       }
     });
   }, []);
 
   const redirectPage = (href) => {
-    // history.push(`/category/${href}`);
     setIdShow(href);
     setDialog(true);
   };
@@ -31,8 +30,8 @@ const Category = () => {
         <ul className="menu">
           {listCategory.map((i) => (
             <li
-              className={item === i._id ? `active menu-item` : "menu-item "}
-              onClick={() => redirectPage(i._id)}
+              className={item === i.id ? `active menu-item` : "menu-item "}
+              onClick={() => redirectPage(i.id)}
             >
               {i.name}
             </li>
