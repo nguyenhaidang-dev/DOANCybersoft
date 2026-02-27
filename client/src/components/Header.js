@@ -15,13 +15,19 @@ const Header = () => {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
   const [listStore, setListStore] = useState(JSON.parse(localStorage.getItem('favorite'))|| []);
+
+  useEffect(() => {
+    const syncFavorites = () => {
+      setListStore(JSON.parse(localStorage.getItem('favorite')) || []);
+    };
+    window.addEventListener('favoritesUpdated', syncFavorites);
+    return () => window.removeEventListener('favoritesUpdated', syncFavorites);
+  }, []);
+
   const logoutHandler = () => {
     dispatch(logout());
   };
 
-  // useEffect(() => {
-  //   listStore = JSON.parse(localStorage.getItem('favorite'))|| 0;
-  // },[JSON.parse(JSON.stringify(listStore))])
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -83,19 +89,18 @@ const Header = () => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        <i class="fas fa-user"></i>
+                        <i className="fas fa-user"></i>
                       </button>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="/profile">
-                          Profile
+                          Trang cá nhân
                         </Link>
-
                         <Link
                           className="dropdown-item"
                           to="#"
                           onClick={logoutHandler}
                         >
-                          Logout
+                          Đăng xuất
                         </Link>
                       </div>
                     </div>
@@ -108,13 +113,12 @@ const Header = () => {
                         aria-haspopup="true"
                         aria-expanded="false"
                       >
-                        <i class="fas fa-user"></i>
-                      </button>
+                      <i className="fas fa-user"></i>
+                    </button>
                       <div className="dropdown-menu">
                         <Link className="dropdown-item" to="/login">
                           Đăng nhập
                         </Link>
-
                         <Link className="dropdown-item" to="/register">
                           Đăng ký
                         </Link>
@@ -122,7 +126,7 @@ const Header = () => {
                     </div>
                   )}
 
-                  <Link to="/cart" className="cart-mobile-icon">
+                  <Link to="/cart" className="cart-mobile-icon" style={{ position: "relative", marginLeft: "12px" }}>
                     <i className="fas fa-shopping-bag"></i>
                     <span className="badge">{cartItems.length}</span>
                   </Link>
@@ -147,7 +151,7 @@ const Header = () => {
           {/* PC HEADER */}
           <div className="pc-header">
             <div className="row">
-              <div className="col-md-3 col-4 d-flex align-items-center mb-4">
+              <div className="col-md-2 col-4 d-flex align-items-center mb-4">
                 <Link className="navbar-brand" to="/">
                   <img alt="logo" src={Logo} />
                 </Link>
@@ -158,16 +162,16 @@ const Header = () => {
                   <input
                     type="search"
                     className="form-control rounded search"
-                    placeholder="Tìm kiếm sản phẩm...."
+                    placeholder="Tìm kiếm sản phẩm..."
                     onChange={(e) => setKeyword(e.target.value)}
                   />
-                  <button type="submit" class="btn btn-success">
-                    <i class="fas fa-search"></i>
+                  <button type="submit" className="btn btn-success">
+                    <i className="fas fa-search"></i>
                   </button>
                 </form>
               </div>
 
-              <div className="col-md-3 d-flex align-items-center justify-content-end Login-Register">
+              <div className="col-md-4 d-flex align-items-center justify-content-end Login-Register">
                 {userInfo ? (
                   <div className="btn-group">
                     <button
@@ -199,12 +203,12 @@ const Header = () => {
                     <Link to="/login">Đăng nhập</Link>
                   </>
                 )}
-                <Link to="/cart">
-                  <i className="fas fa-shopping-bag"></i>
+                <Link to="/cart" style={{ position: "relative", marginLeft: "16px" }}>
+                  <i className="fas fa-shopping-bag" style={{ fontSize: "20px", color: "var(--color-primary)" }}></i>
                   <span className="badge">{cartItems.length}</span>
                 </Link>
-                <Link to="/favorite">
-                <i className="fas fa-heart"></i>
+                <Link to="/favorite" style={{ position: "relative", marginLeft: "16px" }}>
+                  <i className="fas fa-heart" style={{ fontSize: "20px", color: "var(--color-danger)" }}></i>
                   <span className="badge">{listStore.length ? listStore.length : 0}</span>
                 </Link>
               </div>

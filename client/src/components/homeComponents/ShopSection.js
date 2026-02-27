@@ -16,6 +16,23 @@ const ShopSection = (props) => {
   const dispatch = useDispatch();
   const { item } = useParams();
   const [pr, setPr] = useState([]);
+  const [favorites, setFavorites] = useState(JSON.parse(localStorage.getItem('favorite')) || []);
+
+  const isFavorited = (id) => favorites.some(f => f.id === id);
+
+  const toggleFavorite = (product) => {
+    const stored = JSON.parse(localStorage.getItem('favorite')) || [];
+    const exists = stored.find(f => f.id === product.id);
+    let updated;
+    if (exists) {
+      updated = stored.filter(f => f.id !== product.id);
+    } else {
+      updated = [...stored, { id: product.id, name: product.name, img: product.image, price: product.price, quantity: 1 }];
+    }
+    localStorage.setItem('favorite', JSON.stringify(updated));
+    setFavorites(updated);
+    window.dispatchEvent(new Event('favoritesUpdated'));
+  };
 
   const productList = useSelector((state) => state.productList);
   const { loading, error, products, page, pages } = productList;
@@ -44,6 +61,11 @@ const ShopSection = (props) => {
         <Category />
         <Slide />
         <div className="section">
+          <div className="section-heading">
+            <h2>Sản phẩm nổi bật</h2>
+            <p>Khám phá hàng nghìn sản phẩm chăm sóc sức khoẻ chất lượng cao</p>
+            <div className="line"></div>
+          </div>
           <div className="row">
             <div className="col-lg-12 col-md-12 article">
               <div className="shopcontainer row">
@@ -66,6 +88,11 @@ const ShopSection = (props) => {
                               <img src={product.image} alt={product.name} />
                             </div>
                           </Link>
+                          <i
+                            className={`fas fa-heart heart${isFavorited(product.id) ? ' bg-red' : ''}`}
+                            onClick={() => toggleFavorite(product)}
+                            title={isFavorited(product.id) ? 'Xoá khỏi yêu thích' : 'Thêm vào yêu thích'}
+                          ></i>
 
                           <div className="shoptext">
                             <p>
@@ -75,8 +102,8 @@ const ShopSection = (props) => {
                             </p>
 
                             <Rating
-                              value={product.rating}
-                              text={`${product.numReviews} reviews`}
+                              value={product.rating || 0}
+                              text={`${product.numReviews || 0} đánh giá`}
                             />
                             <h3
                               style={{
@@ -112,6 +139,11 @@ const ShopSection = (props) => {
                               <img src={product.image} alt={product.name} />
                             </div>
                           </Link>
+                          <i
+                            className={`fas fa-heart heart${isFavorited(product.id) ? ' bg-red' : ''}`}
+                            onClick={() => toggleFavorite(product)}
+                            title={isFavorited(product.id) ? 'Xoá khỏi yêu thích' : 'Thêm vào yêu thích'}
+                          ></i>
 
                           <div className="shoptext">
                             <p>
@@ -121,8 +153,8 @@ const ShopSection = (props) => {
                             </p>
 
                             <Rating
-                              value={product.rating}
-                              text={`${product.numReviews} reviews`}
+                              value={product.rating || 0}
+                              text={`${product.numReviews || 0} đánh giá`}
                             />
                             <h3
                               style={{

@@ -30,6 +30,7 @@ const Category = () => {
         <ul className="menu">
           {listCategory.map((i) => (
             <li
+              key={i.id}
               className={item === i.id ? `active menu-item` : "menu-item "}
               onClick={() => redirectPage(i.id)}
             >

@@ -20,10 +20,11 @@ const FavoriteScreen = ({ match, location, history }) => {
   };
 
   const removeFromCartHandle = (id) => {
-    const listFavorite = JSON.parse(localStorage.getItem("favorite"));
-      const list = listFavorite.filter((item) => item.id !== id);
-      setListStore(list);
-    JSON.parse(localStorage.setItem("favorite", JSON.stringify(list)));
+    const listFavorite = JSON.parse(localStorage.getItem("favorite")) || [];
+    const list = listFavorite.filter((item) => item.id !== id);
+    setListStore(list);
+    localStorage.setItem("favorite", JSON.stringify(list));
+    window.dispatchEvent(new Event("favoritesUpdated"));
   };
 
   const showPrice = (price) => {
@@ -61,7 +62,7 @@ const FavoriteScreen = ({ match, location, history }) => {
             </div>
             {/* cartiterm */}
             {listStore?.map((item) => (
-              <div className="cart-iterm row">
+              <div className="cart-iterm row" key={item.id}>
                 <div
                   onClick={() => removeFromCartHandle(item.id)}
                   className="remove-button d-flex justify-content-center align-items-center"

@@ -78,9 +78,7 @@ export const register = (name, email, phone, password) => async (dispatch) => {
     // Extract user data from BaseResponse wrapper
     const userData = data.data;
     dispatch({ type: USER_REGISTER_SUCCESS, payload: userData });
-    dispatch({ type: USER_LOGIN_SUCCESS, payload: userData });
-
-    localStorage.setItem("userInfo", JSON.stringify(userData));
+    // Không tự đăng nhập — user phải đăng nhập thủ công sau khi đăng ký
   } catch (error) {
     dispatch({
       type: USER_REGISTER_FAIL,

@@ -56,36 +56,42 @@ const SingleProduct = ({ history, match }) => {
       toast.error('Sản Phẩm này thuộc vào phần kê đơn');
       return;
     }
-    // console.log(productDetails);
+    dispatch(addToCart(productId, qty, 'buy'));
+    toast.success('Đã thêm vào giỏ hàng!');
+  };
+
+  const BuyNowHandle = (e) => {
+    e.preventDefault();
+    if (productDetails?.product?.category == CATEGORY) {
+      toast.error('Sản Phẩm này thuộc vào phần kê đơn');
+      return;
+    }
+    dispatch(addToCart(productId, qty, 'buy'));
     history.push(`/cart/${productId}?qty=${qty}`);
   };
 
   const AddToFavoriteHandle = () => {
-    const store = JSON.parse(localStorage.getItem('favorite'));
-    let obj = {
+    const stored = JSON.parse(localStorage.getItem('favorite')) || [];
+    const obj = {
       id: product.id,
       name: product.name,
       img: product.image,
       price: product.price,
       quantity: 1
-    }
+    };
 
-    if (store) {
-      const listStore = JSON.parse(localStorage.getItem('favorite'));
-      const a = [...listStore];
-      const exits = a.find(item => item.id == product.id);
-      if (exits) {
-        toast.error('Danh sách yêu thích đã tồn tại')
-      } else {
-        a.push(obj)
-        localStorage.setItem('favorite', JSON.stringify(a));
-      }
+    const exists = stored.find(item => item.id === product.id);
+    let updated;
+    if (exists) {
+      updated = stored.filter(item => item.id !== product.id);
+      toast.info('Đã xoá khỏi danh sách yêu thích');
     } else {
-      const a = [];
-      a.push(obj)
-      localStorage.setItem('favorite', JSON.stringify(a));
+      updated = [...stored, obj];
+      toast.success('Đã thêm vào danh sách yêu thích');
     }
-    history.push(`/favorite`);
+    localStorage.setItem('favorite', JSON.stringify(updated));
+    setListStore(updated);
+    window.dispatchEvent(new Event('favoritesUpdated'));
   }
 
   const submitHandler = (e) => {
@@ -114,7 +120,7 @@ const SingleProduct = ({ history, match }) => {
           <Message variant="alert-danger">{error}</Message>
         ) : (
           <>
-            <div className="row">
+            <div className="row g-4 justify-content-center align-items-start">
               <div className="col-md-6">
                 <div className="single-image">
                   <img src={product.image} alt={product.name} />
@@ -128,7 +134,7 @@ const SingleProduct = ({ history, match }) => {
                   </div>
                   <p>{product.description}</p>
 
-                  <div className="product-count col-lg-7 ">
+                  <div className="product-count col-12">
                     <div className="flex-box d-flex justify-content-between align-items-center">
                       <h6>Giá Mua </h6>
                       <span>{product.price && showPrice(product.price)}</span>
@@ -152,33 +158,55 @@ const SingleProduct = ({ history, match }) => {
                     <div className="flex-box d-flex justify-content-between align-items-center">
                       <h6>Đánh giá</h6>
                       <Rating
-                        value={product.rating}
-                        text={`${product.numReviews} reviews`}
+                        value={product.rating || 0}
+                        text={`${product.numReviews || 0} đánh giá`}
                       />
                     </div>
                     {product.countInStock > 0 ? (
                       <>
                         <div className="flex-box d-flex justify-content-between align-items-center">
                           <h6>Số lượng</h6>
-                          <select
-                            value={qty}
-                            onChange={(e) => setQty(e.target.value)}
-                          >
-                            {[...Array(product.countInStock).keys()].map(
-                              (x) => (
-                                <option key={x + 1} value={x + 1}>
-                                  {x + 1}
-                                </option>
-                              )
-                            )}
-                          </select>
+                          <div className="qty-control">
+                            <button
+                              type="button"
+                              className="qty-btn"
+                              disabled={qty <= 1}
+                              onClick={() => setQty(q => Math.max(1, Number(q) - 1))}
+                            >−</button>
+                            <input
+                              type="number"
+                              className="qty-input"
+                              value={qty}
+                              min={1}
+                              max={product.countInStock}
+                              onChange={(e) => {
+                                const v = Math.max(1, Math.min(product.countInStock, Number(e.target.value) || 1));
+                                setQty(v);
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="qty-btn"
+                              disabled={qty >= product.countInStock}
+                              onClick={() => setQty(q => Math.min(product.countInStock, Number(q) + 1))}
+                            >+</button>
+                          </div>
                         </div>
-                        <button
-                          onClick={AddToCartHandle}
-                          className="round-black-btn"
-                        >
-                          Thanh toán
-                        </button>
+                        <div className="product-action-row">
+                          <button
+                            onClick={AddToCartHandle}
+                            className="round-black-btn"
+                            style={{ background: 'var(--color-primary)', marginRight: '8px' }}
+                          >
+                            <i className="fas fa-shopping-cart"></i> Thêm vào giỏ
+                          </button>
+                          <button
+                            onClick={BuyNowHandle}
+                            className="round-black-btn"
+                          >
+                            <i className="fas fa-bolt"></i> Mua ngay
+                          </button>
+                        </div>
                       </>
                     ) : null}
                   </div>

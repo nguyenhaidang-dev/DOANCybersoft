@@ -53,12 +53,12 @@ const Dialog = ({ idParent, isOpenDialog, setCloseDialog, onClickOpen }) => {
                 />
               </div>
             ) : (
-              <ul class="menu menu-dialog">
+              <ul className="menu menu-dialog">
                 {listItem.length > 0 ? (
                   listItem.map((o, index) => (
                     <li
                       key={index}
-                      class="menu-item-con item-dialog"
+                      className="menu-item-con item-dialog"
                       onClick={() => redirectPage(o.id || o._id)}
                     >
                       {o.name}

@@ -202,5 +202,4 @@ public class ProductServiceImpl implements ProductService {
                 product.getIsBought(), product.getCreatedAt(), product.getUpdatedAt());
     }
 
-    // Migrated from NodeJS ProductRoutes logic
 }

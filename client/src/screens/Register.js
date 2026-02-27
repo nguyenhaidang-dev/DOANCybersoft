@@ -21,7 +21,7 @@ const Register = ({ location, history }) => {
 
   useEffect(() => {
     if (userInfo) {
-      history.push(redirect);
+      history.push(redirect !== "/" ? `/login?redirect=${redirect}` : "/login");
     }
   }, [userInfo, history, redirect]);
 
