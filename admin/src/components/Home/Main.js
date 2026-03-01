@@ -17,11 +17,16 @@ const Main = () => {
   const { loading, error, orders } = orderList;
   const productList = useSelector((state) => state.productList);
   const { products } = productList;
+  const { userInfo } = useSelector((state) => state.userLogin);
   const [data, setData] = useState([]);
   const [res, setRes] = useState({});
+  const now = new Date();
+  const thisYear = now.getFullYear();
+  const thisMonth = String(now.getMonth() + 1).padStart(2, '0');
+  const lastDay = new Date(thisYear, now.getMonth() + 1, 0).getDate();
   const [date, setDate] = useState({
-    startDate: '2023-0-1',
-    endDate : '2023-11-31'
+    startDate: `${thisYear}-01-01`,
+    endDate: `${thisYear}-${thisMonth}-${lastDay}`
   })
 
   const handleDownload = async () => {
@@ -38,16 +43,25 @@ const Main = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await axios.get("/api/orders/filter/2023-0-1/2023-11-31");
-      setData(result.data);
-      renderChart();
+      try {
+        const config = {
+          headers: { Authorization: `Bearer ${userInfo?.token}` },
+        };
+        const startDefault = `${new Date().getFullYear()}-01-01`;
+        const nowD = new Date();
+        const endDefault = `${nowD.getFullYear()}-${String(nowD.getMonth()+1).padStart(2,'0')}-${new Date(nowD.getFullYear(), nowD.getMonth()+1, 0).getDate()}`;
+        const result = await axios.get(`/api/orders/filter/${startDefault}/${endDefault}`, config);
+        setData(result.data?.data ?? result.data ?? []);
+      } catch (err) {
+        console.warn('Không thể tải dữ liệu thống kê:', err?.response?.status);
+      }
     };
   
     fetchData();
-  }, []);
+  }, [userInfo]);
 
   const renderChart = () => {
-      const labels = data.map((item) =>`Tháng ` + item._id.month + ` - ` + item._id.year);
+    const labels = data.map((item) => `Tháng ` + (item.id || item._id));
     const counts = data.map((item) => item.count);
     const totalPrice = data.map((item) => item.totalPrice);
 
@@ -78,9 +92,15 @@ const Main = () => {
     if (!date.startDate || !date.endDate) {
       toast.error('Vui lòng điền thông tin trước khi lọc');
     } else {
-      const result = await axios.get(`/api/orders/filter/${date.startDate}/${date.endDate}`);
-      setData(result.data);
-      renderChart();
+      try {
+        const config = {
+          headers: { Authorization: `Bearer ${userInfo?.token}` },
+        };
+        const result = await axios.get(`/api/orders/filter/${date.startDate}/${date.endDate}`, config);
+        setData(result.data?.data ?? result.data ?? []);
+      } catch (err) {
+        toast.error('Không thể tải dữ liệu: ' + (err?.response?.status === 403 ? 'Không có quyền truy cập' : err.message));
+      }
     }
   }
 

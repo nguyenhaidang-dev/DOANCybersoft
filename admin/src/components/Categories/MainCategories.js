@@ -38,7 +38,8 @@ const MainCategories = () => {
   const fetchData = async () => {
     const res = await axios.get("/api/category/all");
     if (res.status === 200) {
-      setListCategory(res.data);
+      const cats = res.data?.data ?? res.data;
+      setListCategory(Array.isArray(cats) ? cats : []);
     }
   };
 
@@ -52,36 +53,41 @@ const MainCategories = () => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-    const res = await axios.post("/api/category", {
-      name: formCategory.name,
-      isShow: formCategory.isShow,
-      description: formCategory.description,
-      parentCategory: formCategory.parentCategory,
-    });
-
-    if (res.status === 201) {
-      toast.success("Tạo danh mục thành công", ToastObjects);
-      await fetchData();
-      cleanForm();
-    } else if (res.status === 400) {
-      toast.error("Danh mục đã tồn tại", ToastObjects);
+    try {
+      const res = await axios.post("/api/category", {
+        name: formCategory.name,
+        isShow: formCategory.isShow,
+        description: formCategory.description,
+        parentCategory: formCategory.parentCategory || null,
+      });
+      if (res.status === 201) {
+        toast.success("Tạo danh mục thành công", ToastObjects);
+        await fetchData();
+        cleanForm();
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Tạo danh mục thất bại";
+      toast.error(msg, ToastObjects);
     }
   };
 
   const updateForm = async (e) => {
     e.preventDefault();
-    const res = await axios.put(`/api/category/${idEdit}`, {
-      name: formCategory.name,
-      isShow: formCategory.isShow,
-      description: formCategory.description,
-    });
-
-    if (res.status === 200) {
-      toast.success("Cập nhật danh mục thành công", ToastObjects);
-      await fetchData();
-      cleanForm();
-    } else if (res.status === 400) {
-      toast.error("Danh mục đã tồn tại", ToastObjects);
+    try {
+      const res = await axios.put(`/api/category/${idEdit}`, {
+        name: formCategory.name,
+        isShow: formCategory.isShow,
+        description: formCategory.description,
+      });
+      if (res.status === 200) {
+        toast.success("Cập nhật danh mục thành công", ToastObjects);
+        await fetchData();
+        cleanForm();
+        setIdEdit(-1);
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Cập nhật thất bại";
+      toast.error(msg, ToastObjects);
     }
   };
 
@@ -106,12 +112,13 @@ const MainCategories = () => {
   const handleEditItem = async (id) => {
     const res = await axios.get(`/api/category/${id}`);
     if (res.status === 200) {
+      const cat = res.data?.data ?? res.data;
       setFormCategory({
-        name: res.data.name,
-        isShow: res.data.isShow,
-        description: res.data.description,
+        name: cat.name,
+        isShow: cat.isShow,
+        description: cat.description,
       });
-      setIdEdit(res.data._id);
+      setIdEdit(cat.id);
     }
   };
 
@@ -139,7 +146,7 @@ const MainCategories = () => {
                   >
                     <option value="">-- default ---</option>
                     {listCategory.map((e) => (
-                      <option key={e.id} value={e._id}>
+                      <option key={e.id} value={e.id}>
                         {e.name}
                       </option>
                     ))}
@@ -208,8 +215,9 @@ const MainCategories = () => {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Mã danh mục</th>
+                    <th>#</th>
                     <th>Tên danh mục</th>
+                    <th>Loại</th>
                     <th>Hiển thị</th>
                     <th>Mô tả</th>
                     <th className="text-end">Action</th>
@@ -219,13 +227,18 @@ const MainCategories = () => {
                 <tbody>
                   {listCategory?.map((item, index) => (
                     <tr key={item.id}>
-                      <td>{index}</td>
+                      <td>{item.id}</td>
                       <td>
-                        <b>{item.name}</b>
+                        <b>{item.isParent ? item.name : <span style={{paddingLeft:'16px'}}>↳ {item.name}</span>}</b>
+                      </td>
+                      <td>
+                        <span style={{fontSize:'12px', padding:'2px 6px', borderRadius:'4px', background: item.isParent ? '#d1fae5' : '#e0f2fe', color: item.isParent ? '#065f46' : '#0369a1'}}>
+                          {item.isParent ? 'Danh mục cha' : 'Danh mục con'}
+                        </span>
                       </td>
                       <td
                         onClick={() =>
-                          handleChangeShowItem(item._id, item.isShow)
+                          handleChangeShowItem(item.id, item.isShow)
                         }
                       >
                         {item.isShow ? (
@@ -251,13 +264,13 @@ const MainCategories = () => {
                           <div className="dropdown-menu">
                             <div
                               className="dropdown-item"
-                              onClick={() => handleEditItem(item._id)}
+                              onClick={() => handleEditItem(item.id)}
                             >
                               Chỉnh sửa
                             </div>
                             <div
                               className="dropdown-item text-danger"
-                              onClick={() => deleteItem(item._id)}
+                              onClick={() => deleteItem(item.id)}
                             >
                               Xóa
                             </div>

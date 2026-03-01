@@ -89,8 +89,12 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Check if user owns the order or is admin
-        if (!order.getUser().getId().equals(userId)) {
+        // Allow admin to view any order
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        boolean isAdmin = user.getIsAdmin() != null && user.getIsAdmin();
+
+        if (!isAdmin && !order.getUser().getId().equals(userId)) {
             throw new RuntimeException("Not authorized to view this order");
         }
 
@@ -178,6 +182,10 @@ public class OrderServiceImpl implements OrderService {
         order.setIsDelivered(true);
         order.setDeliveredAt(LocalDateTime.now());
         order.setStatus(status);
+        if (!Boolean.TRUE.equals(order.getIsPaid())) {
+            order.setIsPaid(true);
+            order.setPaidAt(LocalDateTime.now());
+        }
 
         Order updatedOrder = orderRepository.save(order);
         return convertToDTO(updatedOrder);
@@ -257,7 +265,7 @@ public class OrderServiceImpl implements OrderService {
                                 Collectors.toList(),
                                 list -> {
                                     Map<String, Object> map = new HashMap<>();
-                                    map.put("_id", list.get(0).getCreatedAt().getMonthValue() + "/" + list.get(0).getCreatedAt().getYear());
+                                    map.put("id", list.get(0).getCreatedAt().getMonthValue() + "/" + list.get(0).getCreatedAt().getYear());
                                     map.put("count", (long) list.size());
                                     map.put("totalPrice", list.stream().mapToDouble(o -> o.getTotalPrice().doubleValue()).sum());
                                     return map;
@@ -266,7 +274,12 @@ public class OrderServiceImpl implements OrderService {
                 ))
                 .values()
                 .stream()
-                .sorted((a, b) -> Integer.compare((Integer) a.get("_id"), (Integer) b.get("_id")))
+                .sorted((a, b) -> {
+                    String[] aParts = ((String) a.get("id")).split("/");
+                    String[] bParts = ((String) b.get("id")).split("/");
+                    int yearCmp = Integer.compare(Integer.parseInt(aParts[1]), Integer.parseInt(bParts[1]));
+                    return yearCmp != 0 ? yearCmp : Integer.compare(Integer.parseInt(aParts[0]), Integer.parseInt(bParts[0]));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -367,7 +380,7 @@ public class OrderServiceImpl implements OrderService {
         repairAddress.setOrder(repairOrder);
         repairOrder.setShippingAddress(repairAddress);
 
-        // Tính lại giá dựa trên items thực tế
+
         BigDecimal itemsPrice = originalOrder.getOrderItems().stream()
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQty())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -421,5 +434,4 @@ public class OrderServiceImpl implements OrderService {
                 order.getCreatedAt(), order.getUpdatedAt());
     }
 
-    // Migrated from NodeJS orderRoutes logic
 }

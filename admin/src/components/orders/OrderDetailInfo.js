@@ -26,7 +26,7 @@ const OrderDetailInfo = ({order}) => {
           <div className="text">
             <h6 className="mb-1">Thông tin đơn hàng</h6>
             <p className="mb-1">
-              Shipping: {order.shippingAddress.country} <br /> Hình thức thanh
+              Shipping: {order.shippingAddress?.country} <br /> Hình thức thanh
               toán:{" "}
               {order.paymentMethod == "Credit" ? "Khi nhận hàng" : "Paypal"}
             </p>
@@ -41,10 +41,10 @@ const OrderDetailInfo = ({order}) => {
           <div className="text">
             <h6 className="mb-1">Giao cho</h6>
             <p className="mb-1">
-              Địa chỉ: {order.shippingAddress.city}
+              Địa chỉ: {order.shippingAddress?.city}
               <br />
-              {order.shippingAddress.address}
-              <br /> {order.shippingAddress.postalCode}
+              {order.shippingAddress?.address}
+              <br /> {order.shippingAddress?.postalCode}
             </p>
           </div>
         </article>

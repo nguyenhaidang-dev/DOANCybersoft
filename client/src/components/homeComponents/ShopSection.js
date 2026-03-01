@@ -37,15 +37,18 @@ const ShopSection = (props) => {
   const productList = useSelector((state) => state.productList);
   const { loading, error, products, page, pages } = productList;
 
-  useEffect(async () => {
-    if (item) {
-      const res = await axios.get(`/api/products/searchHere/${item}`);
-      if (res.status === 200) {
-        setPr(res.data.data || []);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (item) {
+        const res = await axios.get(`/api/products/searchHere/${item}`);
+        if (res.status === 200) {
+          setPr(res.data.data || []);
+        }
+      } else {
+        dispatch(listProduct(keyword, pagenumber));
       }
-    } else {
-      dispatch(listProduct(keyword, pagenumber));
-    }
+    };
+    fetchProducts();
   }, [dispatch, keyword, pagenumber, item]);
 
   const showPrice = (price) => {

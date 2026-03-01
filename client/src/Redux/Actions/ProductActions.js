@@ -17,7 +17,7 @@ import { logout } from "./userActions";
 
 // PRODUCT LIST
 export const listProduct =
-  (keyword = " ", pageNumber = " ") =>
+  (keyword = "", pageNumber = 1) =>
   async (dispatch) => {
     try {
       dispatch({ type: PRODUCT_LIST_REQUEST });

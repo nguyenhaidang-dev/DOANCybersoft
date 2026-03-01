@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { USER_CREATE_RESET } from "../../Redux/Constants/UserContants";
@@ -18,22 +18,20 @@ const AddUserMain = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const history = useHistory();
 
   const dispatch = useDispatch();
 
-  const productCreate = useSelector((state) => state.productCreate);
-  const { loading, error, user } = productCreate;
+  const userCreate = useSelector((state) => state.userCreate);
+  const { loading, error, success } = userCreate;
 
   useEffect(() => {
-    if (user) {
-      toast.success("User Added", ToastObjects);
+    if (success) {
+      toast.success("Đã thêm người dùng thành công!", ToastObjects);
       dispatch({ type: USER_CREATE_RESET });
-      setName("");
-      setEmail("");
-      setPassword("");
+      history.push("/users");
     }
-  }, [user, dispatch]);
+  }, [success, dispatch, history]);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -45,16 +43,13 @@ const AddUserMain = () => {
       <Toast />
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={submitHandler}>
-          <div className="content-header">
+          <div className="content-header justify-content-start gap-3">
             <Link to="/users" className="btn btn-danger text-white">
               Đi đến danh sách người dùng
             </Link>
-            <h2 className="content-title">Thêm người dùng</h2>
-            <div>
-              <button type="submit" className="btn btn-primary">
-                Thêm người dùng
-              </button>
-            </div>
+            <button type="submit" className="btn btn-primary">
+              Thêm người dùng
+            </button>
           </div>
 
           <div className="row mb-4">

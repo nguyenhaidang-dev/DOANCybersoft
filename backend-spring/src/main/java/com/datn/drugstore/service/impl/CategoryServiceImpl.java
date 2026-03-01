@@ -1,14 +1,9 @@
 package com.datn.drugstore.service.impl;
 
-import com.datn.drugstore.dto.BannerDTO;
 import com.datn.drugstore.dto.CategoryDTO;
-import com.datn.drugstore.request.CreateBannerRequest;
 import com.datn.drugstore.request.CreateCategoryRequest;
-import com.datn.drugstore.request.UpdateBannerRequest;
 import com.datn.drugstore.request.UpdateCategoryRequest;
-import com.datn.drugstore.entity.Banner;
 import com.datn.drugstore.entity.Category;
-import com.datn.drugstore.repository.BannerRepository;
 import com.datn.drugstore.repository.CategoryRepository;
 import com.datn.drugstore.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +18,6 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final BannerRepository bannerRepository;
 
     @Override
     public List<CategoryDTO> getAllCategories() {
@@ -118,71 +112,9 @@ public class CategoryServiceImpl implements CategoryService {
         return convertToDTO(updatedCategory);
     }
 
-    // Banner methods
-    @Override
-    public BannerDTO getBannerById(Long id) {
-        Banner banner = bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner not found"));
-        return convertBannerToDTO(banner);
-    }
-
-    @Override
-    public List<BannerDTO> getAllBanners() {
-        return bannerRepository.findAll().stream()
-                .map(this::convertBannerToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public BannerDTO createBanner(CreateBannerRequest request) {
-        // Check if banner linkImg exists
-        List<Banner> existing = bannerRepository.findAll().stream()
-                .filter(b -> b.getLinkImg().equals(request.getLinkImg()))
-                .collect(Collectors.toList());
-        if (!existing.isEmpty()) {
-            throw new RuntimeException("Banner link image already exists");
-        }
-
-        Banner banner = new Banner();
-        banner.setLinkImg(request.getLinkImg());
-        banner.setLinkPage(request.getLinkPage());
-        banner.setIsShow(request.getIsShow() != null ? request.getIsShow() : false);
-
-        Banner savedBanner = bannerRepository.save(banner);
-        return convertBannerToDTO(savedBanner);
-    }
-
-    @Override
-    @Transactional
-    public BannerDTO updateBanner(Long id, UpdateBannerRequest request) {
-        Banner banner = bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner not found"));
-
-        if (request.getLinkImg() != null) banner.setLinkImg(request.getLinkImg());
-        if (request.getLinkPage() != null) banner.setLinkPage(request.getLinkPage());
-        if (request.getIsShow() != null) banner.setIsShow(request.getIsShow());
-
-        Banner updatedBanner = bannerRepository.save(banner);
-        return convertBannerToDTO(updatedBanner);
-    }
-
-    @Override
-    @Transactional
-    public void deleteBanner(Long id) {
-        Banner banner = bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Banner not found"));
-        bannerRepository.delete(banner);
-    }
-
     private CategoryDTO convertToDTO(Category category) {
         return new CategoryDTO(category.getId(), category.getName(), category.getDescription(),
                 category.getIsShow(), category.getParentCategory(), category.getIsParent(),
                 category.getCreatedAt(), category.getUpdatedAt());
-    }
-
-    private BannerDTO convertBannerToDTO(Banner banner) {
-        return new BannerDTO(banner.getId(), banner.getLinkImg(), banner.getLinkPage(),
-                banner.getIsShow(), banner.getCreatedAt(), banner.getUpdatedAt());
     }
 }

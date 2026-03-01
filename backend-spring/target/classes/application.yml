@@ -7,6 +7,11 @@ spring:
     username: root
     password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
   jpa:
     hibernate:
       ddl-auto: update
@@ -45,3 +50,11 @@ app:
 paypal:
   client:
     id: AV0xw66zxFf6qyi_1UzGgle1Ux7wVKI06WkuFEhqRRw7omNu6ThSKSLcmCvChDGWmxAhY09txQFn2T56
+
+aws:
+  s3:
+    bucketName: ${AWS_S3_BUCKET_NAME}
+    accessKey: ${AWS_ACCESS_KEY}
+    secretKey: ${AWS_SECRET_KEY}
+    region: ${AWS_REGION}
+    endpointUrl: ${AWS_S3_ENDPOINT_URL}

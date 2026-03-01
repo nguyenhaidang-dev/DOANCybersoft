@@ -37,7 +37,7 @@ const SingleProduct = ({ history, match }) => {
 
   useEffect(() => {
     if (successCreateReview) {
-      alert("Review Submitted");
+      toast.success("Đã gửi đánh giá thành công!");
       setRating(0);
       setComment("");
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });

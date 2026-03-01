@@ -23,8 +23,22 @@ import AddUser from "./screens/AddUser";
 import AddPdf from "./screens/AddPdf";
 import PdfEditScreen from "./screens/PdfEditScreen";
 import PDF from "./components/PDF";
-import SlideScreen from "./screens/SlideScreen";
 import Prescription from "./screens/Prescription";
+import axios from "axios";
+
+// Global axios interceptor: tự động đính token vào mọi request
+axios.interceptors.request.use(
+  (config) => {
+    const userInfo = localStorage.getItem("userInfo")
+      ? JSON.parse(localStorage.getItem("userInfo"))
+      : null;
+    if (userInfo?.token && !config.headers["Authorization"]) {
+      config.headers["Authorization"] = `Bearer ${userInfo.token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 function App() {
   const dispatch = useDispatch();
@@ -51,7 +65,6 @@ function App() {
           <PrivateRouter path="/addproduct" component={AddProduct} />
           <PrivateRouter path="/users" component={UsersScreen} />
           <PrivateRouter path="/adduser" component={AddUser} />
-          <PrivateRouter path="/slide" component={SlideScreen} />
           <PrivateRouter path="/prescription" component={Prescription} />
           {/* pdf router */}
           {/* <PrivateRouter path="/pdf" component={PdfScreen} />

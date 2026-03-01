@@ -16,4 +16,5 @@ public interface UserService {
     UserDTO updateProfile(Long userId, UpdateProfileRequest request);
     List<User> getAllUsers();
     Optional<User> findByEmail(String email);
+    void deleteUser(Long id);
 }

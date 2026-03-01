@@ -41,12 +41,18 @@ const AddProductMain = () => {
   const { loading, error, product } = productCreate;
 
   useEffect(() => {
-    return new Promise(async () => {
-      const res = await axios.get("/api/category/all/status/no");
-      if (res.status === 200) {
-        setListCategory(res.data);
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/api/category/all/status/no");
+        if (res.status === 200) {
+          const cats = res.data?.data ?? res.data;
+          setListCategory(Array.isArray(cats) ? cats : []);
+        }
+      } catch (err) {
+        console.error("Failed to load categories", err);
       }
-    });
+    };
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -76,7 +82,7 @@ const AddProductMain = () => {
           image,
           countInStock,
           loanPrice,
-          category,
+          category ? Number(category) : null,
           ma,
           bought
         )
@@ -112,15 +118,15 @@ const AddProductMain = () => {
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={submitHandler}>
           <div className="content-header">
-            <Link to="/products" className="btn btn-danger text-white">
-              Đi đến danh sách sản phẩm
-            </Link>
-            <h2 className="content-title">Thêm sản phẩm</h2>
-            <div>
+            <div className="d-flex align-items-center gap-2">
+              <Link to="/products" className="btn btn-danger text-white">
+                Đi đến danh sách sản phẩm
+              </Link>
               <button type="submit" className="btn btn-primary">
                 Thêm sản phẩm
               </button>
             </div>
+            <h2 className="content-title">Thêm sản phẩm</h2>
           </div>
 
           <div className="row mb-4">
@@ -193,7 +199,7 @@ const AddProductMain = () => {
                     >
                       <option value=""></option>
                       {listCategory.map((item) => (
-                        <option value={item._id}>{item.name}</option>
+                        <option key={item.id} value={String(item.id)}>{item.name}</option>
                       ))}
                     </select>
                   </div>

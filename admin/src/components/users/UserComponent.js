@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { listUser, deleteUser } from "../../Redux/Actions/userActions";
 import Loading from "../LoadingError/Loading";
 import Message from "../LoadingError/Error";
+import { toast } from "react-toastify";
 
 const UserComponent = () => {
   const dispatch = useDispatch();
@@ -15,20 +16,28 @@ const UserComponent = () => {
     dispatch(listUser());
   }, [dispatch]);
 
-  const deletehandler = (email) => {
-    if (window.confirm("Are you sure??")) {
-      dispatch(deleteUser(email));
-    }
+  const deletehandler = (id) => {
+    toast(
+      ({ closeToast }) => (
+        <div>
+          <p className="mb-2">Xóa người dùng này?</p>
+          <button
+            className="btn btn-danger btn-sm me-2"
+            onClick={() => { dispatch(deleteUser(id)); closeToast(); }}
+          >Xóa</button>
+          <button className="btn btn-secondary btn-sm" onClick={closeToast}>Hủy</button>
+        </div>
+      ),
+      { autoClose: false, closeOnClick: false }
+    );
   };
   return (
     <section className="content-main">
-      <div className="content-header">
-        <h2 className="content-title">Người dùng</h2>
-        <div>
-          <Link to="/adduser" className="btn btn-primary">
-            <i className="material-icons md-plus"></i> Thêm mới
-          </Link>
-        </div>
+      <div className="content-header justify-content-start gap-3">
+        <h2 className="content-title mb-0">Người dùng</h2>
+        <Link to="/adduser" className="btn btn-primary">
+          <i className="material-icons md-plus"></i> Thêm mới
+        </Link>
       </div>
 
       <div className="card mb-4">
@@ -68,7 +77,7 @@ const UserComponent = () => {
           ) : (
             <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4">
               {users.map((user) => (
-                <div className="col" key={user._id}>
+                <div className="col" key={user.id}>
                   <div className="card card-user shadow-sm">
                     <div className="card-header">
                       <img
@@ -98,7 +107,7 @@ const UserComponent = () => {
                           </Link> */}
                           <Link
                             to="#"
-                            onClick={() => deletehandler(user._id)}
+                            onClick={() => deletehandler(user.id)}
                             className="btn btn-sm btn-outline-danger p-2 pb-3 col-md-6"
                           >
                             <i className="fas fa-trash-alt"></i>

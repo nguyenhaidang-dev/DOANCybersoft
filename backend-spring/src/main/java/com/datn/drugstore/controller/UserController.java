@@ -110,6 +110,13 @@ public class UserController {
         return ResponseFactory.success(userDTO, "Cập nhật thành công");
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BaseResponse> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseFactory.successMessage("Đã xóa người dùng");
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BaseResponse> getAllUsers() {

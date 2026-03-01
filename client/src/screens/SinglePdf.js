@@ -9,6 +9,7 @@ import Loading from "../components/LoadingError/Loading";
 import { PDF_CREATE_REVIEW_RESET } from "../Redux/Constants/PdfConstants";
 import moment from "moment";
 import { useHistory, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const SinglePdf = () => {
   const [qty, setQty] = useState(1);
@@ -33,7 +34,7 @@ const SinglePdf = () => {
 
   useEffect(() => {
     if (successCreateReview) {
-      alert("Review Submitted");
+      toast.success("Đã gửi đánh giá thành công!");
       setRating(0);
       setComment("");
       dispatch({ type: PDF_CREATE_REVIEW_RESET });

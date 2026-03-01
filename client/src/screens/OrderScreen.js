@@ -9,6 +9,7 @@ import Message from "./../components/LoadingError/Error";
 import moment from "moment";
 import axios from "axios";
 import { ORDER_PAY_RESET } from "../Redux/Constants/OrderConstants";
+import { toast } from "react-toastify";
 
 const fixEncoding = (str) => {
   if (!str) return str;
@@ -123,7 +124,7 @@ const OrderScreen = ({ match }) => {
     const numericOrderId = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
     
     if (isNaN(numericOrderId)) {
-      alert("Lỗi: Order ID không hợp lệ. Vui lòng thử lại.");
+      toast.error("Lỗi: Order ID không hợp lệ. Vui lòng thử lại.");
       return;
     }
     
@@ -156,14 +157,14 @@ const OrderScreen = ({ match }) => {
   const handleReceive = async () => {
     try {
       if (!userLogin || !userLogin.userInfo) {
-        alert("Vui lòng đăng nhập để xác nhận nhận hàng.");
+        toast.error("Vui lòng đăng nhập để xác nhận nhận hàng.");
         return;
       }
 
       const { userInfo } = userLogin;
       
       if (!userInfo || !userInfo.token) {
-        alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         return;
       }
       
@@ -176,7 +177,7 @@ const OrderScreen = ({ match }) => {
       
       const currentOrderId = order?.id || order?._id;
       if (!currentOrderId) {
-        alert("Không tìm thấy thông tin đơn hàng.");
+        toast.error("Không tìm thấy thông tin đơn hàng.");
         return;
       }
 
@@ -208,7 +209,7 @@ const OrderScreen = ({ match }) => {
         errorMessage = error.message;
       }
       
-      alert(errorMessage);
+      toast.error(errorMessage);
     }
   }
 

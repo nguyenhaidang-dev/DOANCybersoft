@@ -89,17 +89,6 @@ const Sidebar = () => {
               <NavLink
                 activeClassName="active"
                 className="menu-link"
-                to="/slide"
-              >
-                <i className="icon fas fa-store-alt"></i>
-                <span className="text">Banner</span>
-              </NavLink>
-            </li>
-
-            <li className="menu-item">
-              <NavLink
-                activeClassName="active"
-                className="menu-link"
                 to="/prescription"
               >
                 <i className="icon fas fa-usd-circle"></i>
