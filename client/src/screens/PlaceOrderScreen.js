@@ -16,7 +16,7 @@ const PlaceOrderScreen = ({ history }) => {
   const { userInfo } = userLogin;
   const typePay = localStorage.getItem("typePay");
   const payRaw = localStorage.getItem("paymentMethod");
-  const pay = payRaw ? JSON.parse(payRaw) : "Paypal"; // Default to Paypal if not set
+  const pay = payRaw ? JSON.parse(payRaw) : "Paypal";
 
   const addDecimals = (num) => {
     return Math.round(num * 100) / 100;
@@ -40,7 +40,7 @@ const PlaceOrderScreen = ({ history }) => {
       const itemsPrice = addDecimals(
         cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
       );
-      const shippingPrice = addDecimals(itemsPrice > 100 ? 0 : 100);
+      const shippingPrice = addDecimals(itemsPrice > 500000 ? 0 : 30000);
       const taxPrice = addDecimals(Number(0.15 * itemsPrice));
       const totalPrice = Number(itemsPrice) + Number(shippingPrice) + Number(taxPrice);
       
@@ -123,7 +123,7 @@ const PlaceOrderScreen = ({ history }) => {
           shippingPrice: prices.shippingLoanPrice,
           taxPrice: prices.taxLoanPrice,
           totalPrice: prices.totalLoanPrice,
-          isPaid: (pay && pay.toLowerCase() === "credit") ? true : false, // Credit = paid on delivery, Paypal = not paid yet
+          isPaid: (pay && pay.toLowerCase() === "credit") ? true : false, 
           typePay: "loan",
         })
       );
@@ -137,7 +137,7 @@ const PlaceOrderScreen = ({ history }) => {
           shippingPrice: prices.shippingPrice,
           taxPrice: prices.taxPrice,
           totalPrice: prices.totalPrice,
-          isPaid: (pay && pay.toLowerCase() === "credit") ? true : false, // Credit = paid on delivery, Paypal = not paid yet
+          isPaid: (pay && pay.toLowerCase() === "credit") ? true : false, 
           typePay: "buy",
         })
       );

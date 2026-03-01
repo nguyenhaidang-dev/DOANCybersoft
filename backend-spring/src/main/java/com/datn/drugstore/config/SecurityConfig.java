@@ -74,7 +74,8 @@ public class SecurityConfig {
                         .requestMatchers("POST", "/api/users").permitAll()
                         .requestMatchers("GET", "/api/users").hasRole("ADMIN")
                         .requestMatchers(
-                                "/api/users/profile", "/api/users/{id}", "/api/orders", "/api/orders/{id}",
+                                "/api/users/profile", "/api/users/check-session",
+                                "/api/users/{id}", "/api/orders", "/api/orders/{id}",
                                 "/api/orders/{id}/pay",
                                 "/api/orders/{id}/delivered"
                         ).authenticated()

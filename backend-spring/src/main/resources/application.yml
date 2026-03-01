@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/drugstore?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3307/drugstore?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
     username: root
     password: admin123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -44,4 +44,4 @@ app:
 
 paypal:
   client:
-    id: 
+    id: AV0xw66zxFf6qyi_1UzGgle1Ux7wVKI06WkuFEhqRRw7omNu6ThSKSLcmCvChDGWmxAhY09txQFn2T56

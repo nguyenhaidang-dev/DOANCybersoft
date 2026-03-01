@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Header from "./../components/Header";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, removefromcart } from "./../Redux/Actions/cartActions";
+import { addToCart, removefromcart, updateCartQty } from "./../Redux/Actions/cartActions";
 
 const CartScreen = ({ match, location, history }) => {
   window.scrollTo(0, 0);
@@ -39,7 +39,6 @@ const CartScreen = ({ match, location, history }) => {
   return (
     <>
       <Header />
-      {/* Cart */}
       <div className="container">
         {cartItems.length === 0 ? (
           <div className=" alert alert-info text-center mt-3">
@@ -62,9 +61,8 @@ const CartScreen = ({ match, location, history }) => {
                 ({cartItems.length})
               </Link>
             </div>
-            {/* cartiterm */}
             {cartItems.map((item) => (
-              <div className="cart-iterm row">
+              <div className="cart-iterm row" key={item.product}>
                 <div
                   onClick={() => removeFromCartHandle(item.product)}
                   className="remove-button d-flex justify-content-center align-items-center"
@@ -79,20 +77,33 @@ const CartScreen = ({ match, location, history }) => {
                     <h4>{item.name}</h4>
                   </Link>
                 </div>
-                <div className="cart-qty col-md-2 col-sm-5 mt-md-5 mt-3 mt-md-0 d-flex flex-column justify-content-center">
+                <div className="cart-qty col-md-2 col-sm-5 mt-3 mt-md-0 d-flex flex-column justify-content-center">
                   <h6>Số lượng</h6>
-                  <select
-                    value={item.qty}
-                    onChange={(e) =>
-                      dispatch(addToCart(item.product, Number(e.target.value)))
-                    }
-                  >
-                    {[...Array(item.countInStock).keys()].map((x) => (
-                      <option key={x + 1} value={x + 1}>
-                        {x + 1}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="qty-control">
+                    <button
+                      type="button"
+                      className="qty-btn"
+                      disabled={item.qty <= 1}
+                      onClick={() => dispatch(updateCartQty(item.product, item.qty - 1))}
+                    >−</button>
+                    <input
+                      type="number"
+                      className="qty-input"
+                      value={item.qty}
+                      min={1}
+                      max={item.countInStock}
+                      onChange={(e) => {
+                        const v = Math.max(1, Math.min(item.countInStock, Number(e.target.value) || 1));
+                        dispatch(updateCartQty(item.product, v));
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="qty-btn"
+                      disabled={item.qty >= item.countInStock}
+                      onClick={() => dispatch(updateCartQty(item.product, item.qty + 1))}
+                    >+</button>
+                  </div>
                 </div>
                 <div className="cart-price mt-3 mt-md-0 col-md-2 align-items-sm-end align-items-start  d-flex flex-column justify-content-center col-sm-7">
                   <h6>Đơn giá</h6>
@@ -103,7 +114,6 @@ const CartScreen = ({ match, location, history }) => {
               </div>
             ))}
 
-            {/* End of cart iterms */}
             <div className="total">
               <span className="sub">Tổng mua:</span>
               <span className="total-price">{showPrice(total)}</span>
@@ -111,7 +121,7 @@ const CartScreen = ({ match, location, history }) => {
             <hr />
             <div className="cart-buttons d-flex align-items-center row">
               <Link to="/" className="col-md-4 ">
-                <button class="">Mua hàng thêm</button>
+                <button className="">Mua hàng thêm</button>
               </Link>
               {total > 0 && (
                 <div className="col-md-4 d-flex justify-content-md-end mt-3 mt-md-0">

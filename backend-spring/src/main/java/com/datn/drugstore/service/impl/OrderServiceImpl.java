@@ -357,17 +357,30 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList()));
 
         ShippingAddress repairAddress = new ShippingAddress();
-        repairAddress.setAddress("Äáº·t táº¡i quĂ¡n");
-        repairAddress.setCity("Sáº£n pháº©m Ä‘Æ°á»£c mua táº¡i chá»—");
-        repairAddress.setPostalCode("QCODE-200");
-        repairAddress.setCountry("VN");
+        ShippingAddress originalAddress = originalOrder.getShippingAddress();
+        if (originalAddress != null) {
+            repairAddress.setAddress(originalAddress.getAddress());
+            repairAddress.setCity(originalAddress.getCity());
+            repairAddress.setPostalCode(originalAddress.getPostalCode());
+            repairAddress.setCountry(originalAddress.getCountry());
+        }
         repairAddress.setOrder(repairOrder);
         repairOrder.setShippingAddress(repairAddress);
 
-        repairOrder.setPaymentMethod("Paypal");
-        repairOrder.setTaxPrice(BigDecimal.ZERO);
-        repairOrder.setShippingPrice(BigDecimal.ZERO);
-        repairOrder.setTotalPrice(originalOrder.getTotalPrice());
+        // Tính lại giá dựa trên items thực tế
+        BigDecimal itemsPrice = originalOrder.getOrderItems().stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQty())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal shippingPrice = itemsPrice.compareTo(new BigDecimal("500000")) > 0
+                ? BigDecimal.ZERO : new BigDecimal("30000");
+        BigDecimal taxPrice = itemsPrice.multiply(new BigDecimal("0.15"))
+                .setScale(2, java.math.RoundingMode.HALF_UP);
+        BigDecimal totalPrice = itemsPrice.add(shippingPrice).add(taxPrice);
+
+        repairOrder.setPaymentMethod(originalOrder.getPaymentMethod());
+        repairOrder.setTaxPrice(taxPrice);
+        repairOrder.setShippingPrice(shippingPrice);
+        repairOrder.setTotalPrice(totalPrice);
         repairOrder.setTypePay("buy");
         repairOrder.setIsPaid(false);
         repairOrder.setIsDelivered(false);

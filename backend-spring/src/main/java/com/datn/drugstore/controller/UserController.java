@@ -86,6 +86,12 @@ public class UserController {
         return ResponseFactory.success(userDTO);
     }
 
+    // Endpoint nhẹ để frontend polling kiểm tra session còn hợp lệ không
+    @GetMapping("/check-session")
+    public ResponseEntity<BaseResponse> checkSession(@AuthenticationPrincipal User user) {
+        return ResponseFactory.success(null, "ok");
+    }
+
     // Get user by ID
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse> getUserById(@PathVariable Long id, @AuthenticationPrincipal User user) {
