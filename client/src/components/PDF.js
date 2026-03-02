@@ -28,7 +28,7 @@ const PDF = () => {
         {/* show pdf conditionally (if we have one)  */}
         {product.file && (
           <>
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.6.347/build/pdf.worker.min.js">
+            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
               <Viewer
                 fileUrl={product.file}
                 plugins={[defaultLayoutPluginInstance]}
