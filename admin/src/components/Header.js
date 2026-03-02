@@ -79,12 +79,6 @@ const Header = () => {
               />
             </Link>
             <div className="dropdown-menu dropdown-menu-end">
-              <Link className="dropdown-item" to="/">
-                Thông tin cá nhân
-              </Link>
-              <Link className="dropdown-item" to="#">
-                Cài Đặt
-              </Link>
               <Link
                 onClick={logoutHandler}
                 className="dropdown-item text-danger"

@@ -23,7 +23,6 @@ import AddUser from "./screens/AddUser";
 import AddPdf from "./screens/AddPdf";
 import PdfEditScreen from "./screens/PdfEditScreen";
 import PDF from "./components/PDF";
-import Prescription from "./screens/Prescription";
 import axios from "axios";
 
 // Global axios interceptor: tự động đính token vào mọi request
@@ -65,7 +64,6 @@ function App() {
           <PrivateRouter path="/addproduct" component={AddProduct} />
           <PrivateRouter path="/users" component={UsersScreen} />
           <PrivateRouter path="/adduser" component={AddUser} />
-          <PrivateRouter path="/prescription" component={Prescription} />
           {/* pdf router */}
           {/* <PrivateRouter path="/pdf" component={PdfScreen} />
           <PrivateRouter path="/showpdf/:id" component={PDF} />

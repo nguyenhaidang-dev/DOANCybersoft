@@ -54,13 +54,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> getAllProductsPrescription() {
-        return productRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public ProductDTO getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -81,7 +74,6 @@ public class ProductServiceImpl implements ProductService {
         product.setImage(request.getImage());
         product.setCountInStock(request.getCountInStock());
         product.setLoanPrice(request.getLoanPrice());
-        product.setMa(request.getMa());
         product.setIsBought(request.getBought());
 
         if (request.getCategory() != null) {
@@ -91,6 +83,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product savedProduct = productRepository.save(product);
+        savedProduct.setMa(String.valueOf(savedProduct.getId()));
+        productRepository.save(savedProduct);
         return convertToDTO(savedProduct);
     }
 
@@ -111,7 +105,6 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             product.setCategory(category);
         }
-        if (request.getMa() != null) product.setMa(request.getMa());
         if (request.getBought() != null) product.setIsBought(request.getBought());
 
         Product updatedProduct = productRepository.save(product);
@@ -154,15 +147,6 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDTO> searchProducts(String type) {
         return productRepository.findByNameContainingIgnoreCase(type, PageRequest.of(0, 100))
                 .getContent().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProductDTO> searchPrescriptionProducts(String type) {
-        return productRepository.findByNameContainingIgnoreCase(type, PageRequest.of(0, 100))
-                .getContent().stream()
-                .filter(product -> product.getCategory() != null && "6448dce26d5176c1e67a4cb6".equals(product.getCategory().getId().toString()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

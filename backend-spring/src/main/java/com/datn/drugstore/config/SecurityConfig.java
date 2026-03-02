@@ -68,11 +68,11 @@ public class SecurityConfig {
                                 "/", "/api/users/login", "/api/users/register", "/api/users/get-only-email/**",
                                 "/uploads/**",
                                 "/api/products/search/**", "/api/products/searchHere/**",
-                                "/api/products/all", "/api/products/all-prescription", "/api/products/search-prescription/**",
+                                "/api/products/all",
                                 "/api/category/all", "/api/category/all/status", "/api/category/all/status/no",
                                 "/api/category/all/status-detail/**", "/api/category/{id}",
                                 "/api/pdf/all", "/api/pdf/{id}", "/api/pdf/searchpdf/**",
-                                "/api/orders/prescription-order", "/api/orders/order-repair",
+                                "/api/orders/order-repair",
                                 "/api/config/paypal"
                         ).permitAll()
                         .requestMatchers("POST", "/api/users").permitAll()

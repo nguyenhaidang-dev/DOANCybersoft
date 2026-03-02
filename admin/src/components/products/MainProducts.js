@@ -35,7 +35,7 @@ const MainProducts = () => {
       const data = await axios.get(`${URL}/api/products/search/${keyword}`);
       if (data.status === 200) {
         setIsSearch(1);
-        setData(data.data);
+        setData(data.data.data);
       }
     } catch (error) {
       console.log(error);
@@ -49,8 +49,7 @@ const MainProducts = () => {
       );
       if (data.status === 200) {
         setIsSearch(1);
-        setData(data.data);
-        console.log(data);
+        setData(data.data.data);
       }
     } catch (error) {
       console.log(error);

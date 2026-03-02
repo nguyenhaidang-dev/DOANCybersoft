@@ -49,7 +49,7 @@ app:
 
 paypal:
   client:
-    id: 
+    id: AV0xw66zxFf6qyi_1UzGgle1Ux7wVKI06WkuFEhqRRw7omNu6ThSKSLcmCvChDGWmxAhY09txQFn2T56
 
 aws:
   s3:

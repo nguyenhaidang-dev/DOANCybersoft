@@ -24,7 +24,6 @@ const ToastObjects = {
 const EditProductMain = (props) => {
   const { productId } = props;
 
-  const [ma, setMa] = useState("");
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [images, setImages] = useState(null);
@@ -40,6 +39,7 @@ const EditProductMain = (props) => {
   const [photoURL, setPhotoURL] = useState();
   const [openCrop, setOpenCrop] = useState(false);
   const [checkCrop, setCheckCrop] = useState(false);
+  const [originalFileName, setOriginalFileName] = useState("image.jpg");
   const fileRef = useRef();
 
   const dispatch = useDispatch();
@@ -95,7 +95,6 @@ const EditProductMain = (props) => {
       setLoanPrice(product.loanPrice);
       setCategory(product.category?.id ?? product.category ?? "");
       setPreview(product.image);
-      setMa(product.ma);
       setBought(product.isBought);
     }
   }, [product]);
@@ -115,7 +114,6 @@ const EditProductMain = (props) => {
           countInStock,
           loanPrice,
           category: categoryId,
-          ma,
           bought
         })
       );
@@ -130,7 +128,6 @@ const EditProductMain = (props) => {
           countInStock,
           loanPrice,
           category: categoryId,
-          ma,
           bought
         })
       );
@@ -140,7 +137,8 @@ const EditProductMain = (props) => {
   useEffect(() => {
     if (checkCrop) {
       setPreview("");
-      setImages(file);
+      const namedFile = new File([file], originalFileName, { type: file.type });
+      setImages(namedFile);
       fileRef.current.value = null;
       setCheckCrop(false);
     }
@@ -149,6 +147,7 @@ const EditProductMain = (props) => {
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setOriginalFileName(file.name);
       setFile(file);
       setPhotoURL(URL.createObjectURL(file));
       setOpenCrop(true);
@@ -186,20 +185,6 @@ const EditProductMain = (props) => {
                     <Message variant="alert-danger">{error}</Message>
                   ) : (
                     <>
-                      <div className="mb-4">
-                        <label htmlFor="product_title" className="form-label">
-                          Mã Đại Diện
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Type here"
-                          className="form-control"
-                          id="product_title"
-                          required
-                          value={ma}
-                          onChange={(e) => setMa(e.target.value)}
-                        />
-                      </div>
                       <div className="mb-4">
                         <label htmlFor="product_title" className="form-label">
                           Tiêu đề
