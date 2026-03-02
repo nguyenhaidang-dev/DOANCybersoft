@@ -17,9 +17,7 @@ import PlaceOrderScreen from "./screens/PlaceOrderScreen";
 import OrderScreen from "./screens/OrderScreen";
 import NotFound from "./screens/NotFound";
 import PrivateRouter from "./PrivateRouter";
-import PdfFileScreen from "./screens/PdfFileScreen";
-import SinglePdf from "./screens/SinglePdf";
-import PDF from "./components/PDF";
+
 import SearchProduct from "./screens/SearchProduct";
 import FavoriteScreen from "./screens/FavoriteScreen";
 

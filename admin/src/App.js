@@ -18,11 +18,7 @@ import PrivateRouter from "./PrivateRouter";
 import { useDispatch, useSelector } from "react-redux";
 import { listProducts } from "./Redux/Actions/ProductActions";
 import { listOrders } from "./Redux/Actions/OrderActions";
-import PdfScreen from "./screens/pdfScreen";
 import AddUser from "./screens/AddUser";
-import AddPdf from "./screens/AddPdf";
-import PdfEditScreen from "./screens/PdfEditScreen";
-import PDF from "./components/PDF";
 import axios from "axios";
 
 // Global axios interceptor: tự động đính token vào mọi request
