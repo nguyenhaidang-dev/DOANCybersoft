@@ -3,15 +3,17 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/drugstore?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: admin123
+    url: ${DB_URL:jdbc:mysql://localhost:3307/drugstore?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   servlet:
     multipart:
       enabled: true
       max-file-size: 5MB
       max-request-size: 10MB
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,13 +21,15 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
   security:
     enabled: true
+
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ndat04913@gmail.com
-    password: wpyy zjfi jhhq cdcc
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -35,21 +39,21 @@ spring:
             required: true
 
 jwt:
-  secret-key: wRX3rsm0Eh/nzsc2CLN1StaZ4/jWXnuCy450YxZQep0=
+  secret-key: ${JWT_SECRET}
   expiration: 86400000
 
 redis:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6379}
-  password: ${REDIS_PASSWORD:Aa@123456}
+  password: ${REDIS_PASSWORD}
 
 app:
   name: Drugstore
-  url: http://localhost:3000
+  url: ${APP_URL:http://localhost:3000}
 
 paypal:
   client:
-    id: AV0xw66zxFf6qyi_1UzGgle1Ux7wVKI06WkuFEhqRRw7omNu6ThSKSLcmCvChDGWmxAhY09txQFn2T56
+    id: ${PAYPAL_CLIENT_ID}
 
 aws:
   s3:
