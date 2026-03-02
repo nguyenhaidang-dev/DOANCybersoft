@@ -46,21 +46,9 @@ public class ProductController {
         return ResponseFactory.success(products);
     }
 
-    @GetMapping("/all-prescription")
-    public ResponseEntity<BaseResponse> getAllProductsPrescription() {
-        List<ProductDTO> products = productService.getAllProductsPrescription();
-        return ResponseFactory.success(products);
-    }
-
     @GetMapping("/search/{type}")
     public ResponseEntity<BaseResponse> searchProducts(@PathVariable String type) {
         List<ProductDTO> products = productService.searchProducts(type);
-        return ResponseFactory.success(products);
-    }
-
-    @GetMapping("/search-prescription/{type}")
-    public ResponseEntity<BaseResponse> searchPrescriptionProducts(@PathVariable String type) {
-        List<ProductDTO> products = productService.searchPrescriptionProducts(type);
         return ResponseFactory.success(products);
     }
 
@@ -106,11 +94,17 @@ public class ProductController {
 
     @GetMapping("/searchProduct/{option}")
     public ResponseEntity<BaseResponse> searchProductByOption(@PathVariable String option) {
-        List<ProductDTO> products;
+        List<ProductDTO> products = productService.getAllProductsAdmin();
         if ("old".equals(option)) {
-            products = productService.getAllProductsAdmin();
+            // Thêm mới nhất: id giảm dần
+            products = products.stream()
+                    .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
+                    .collect(java.util.stream.Collectors.toList());
         } else {
-            products = productService.getAllProductsAdmin();
+            // Thêm cũ nhất: id tăng dần
+            products = products.stream()
+                    .sorted((a, b) -> Long.compare(a.getId(), b.getId()))
+                    .collect(java.util.stream.Collectors.toList());
         }
         return ResponseFactory.success(products);
     }

@@ -24,10 +24,9 @@ const ToastObjects = {
 const EditProductMain = (props) => {
   const { productId } = props;
 
-  const [ma, setMa] = useState("");
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
-  const [images, setImages] = useState({});
+  const [images, setImages] = useState(null);
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
   const [loanPrice, setLoanPrice] = useState(0);
@@ -40,6 +39,7 @@ const EditProductMain = (props) => {
   const [photoURL, setPhotoURL] = useState();
   const [openCrop, setOpenCrop] = useState(false);
   const [checkCrop, setCheckCrop] = useState(false);
+  const [originalFileName, setOriginalFileName] = useState("image.jpg");
   const fileRef = useRef();
 
   const dispatch = useDispatch();
@@ -55,12 +55,18 @@ const EditProductMain = (props) => {
   } = productUpdate;
 
   useEffect(() => {
-    return new Promise(async () => {
-      const res = await axios.get("/api/category/all/status/no");
-      if (res.status === 200) {
-        setListCategory(res.data);
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/api/category/all/status/no");
+        if (res.status === 200) {
+          const cats = res.data?.data ?? res.data;
+          setListCategory(Array.isArray(cats) ? cats : []);
+        }
+      } catch (err) {
+        console.error("Failed to load categories", err);
       }
-    });
+    };
+    fetchCategories();
   }, []);
 
   const handleChangeImages = (e) => {
@@ -70,56 +76,58 @@ const EditProductMain = (props) => {
   };
 
   useEffect(() => {
+    dispatch(editProduct(productId));
+  }, [productId]);
+
+  useEffect(() => {
     if (successUpdate) {
       dispatch({ type: PRODUCT_UPDATE_RESET });
       toast.success("Product Updated", ToastObjects);
-    } else {
-      if (!product.name || product.id !== productId) {
-        dispatch(editProduct(productId));
-      } else {
-        setName(product.name);
-        setDescription(product.description);
-        setCountInStock(product.countInStock);
-        setPrice(product.price);
-        setLoanPrice(product.loanPrice);
-        setCategory(product.category);
-        setPreview(product.image);
-        setMa(product.ma);
-        setBought(product.isBought);
-      }
     }
-  }, [product, dispatch, productId, successUpdate]);
+  }, [successUpdate]);
+
+  useEffect(() => {
+    if (product && product.name && String(product.id) === String(productId)) {
+      setName(product.name);
+      setDescription(product.description);
+      setCountInStock(product.countInStock);
+      setPrice(product.price);
+      setLoanPrice(product.loanPrice);
+      setCategory(product.category?.id ?? product.category ?? "");
+      setPreview(product.image);
+      setBought(product.isBought);
+    }
+  }, [product]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     const image = await imageUpload(images);
+    const categoryId = category ? Number(category) : null;
     if (image) {
       dispatch(
         updateProduct({
-          _id: productId,
+          id: productId,
           name,
           price,
           description,
           image,
           countInStock,
           loanPrice,
-          category,
-          ma,
+          category: categoryId,
           bought
         })
       );
     } else {
       dispatch(
         updateProduct({
-          _id: productId,
+          id: productId,
           name,
           price,
           description,
           image : preview,
           countInStock,
           loanPrice,
-          category,
-          ma,
+          category: categoryId,
           bought
         })
       );
@@ -129,7 +137,8 @@ const EditProductMain = (props) => {
   useEffect(() => {
     if (checkCrop) {
       setPreview("");
-      setImages(file);
+      const namedFile = new File([file], originalFileName, { type: file.type });
+      setImages(namedFile);
       fileRef.current.value = null;
       setCheckCrop(false);
     }
@@ -138,15 +147,12 @@ const EditProductMain = (props) => {
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setOriginalFileName(file.name);
       setFile(file);
       setPhotoURL(URL.createObjectURL(file));
       setOpenCrop(true);
     }
   };
-
-  console.log("====================================");
-  console.log(bought);
-  console.log("====================================");
 
   return (
     <>
@@ -154,15 +160,15 @@ const EditProductMain = (props) => {
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={submitHandler}>
           <div className="content-header">
-            <Link to="/products" className="btn btn-danger text-white">
-              Đi đến trang chủ sản phẩm
-            </Link>
-            <h2 className="content-title">Cập nhật sản phẩm</h2>
-            <div>
+            <div className="d-flex align-items-center gap-2">
+              <Link to="/products" className="btn btn-danger text-white">
+                Đi đến trang chủ sản phẩm
+              </Link>
               <button type="submit" className="btn btn-primary">
                 Cập nhật
               </button>
             </div>
+            <h2 className="content-title">Cập nhật sản phẩm</h2>
           </div>
 
           <div className="row mb-4">
@@ -179,20 +185,6 @@ const EditProductMain = (props) => {
                     <Message variant="alert-danger">{error}</Message>
                   ) : (
                     <>
-                      <div className="mb-4">
-                        <label htmlFor="product_title" className="form-label">
-                          Mã Đại Diện
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="Type here"
-                          className="form-control"
-                          id="product_title"
-                          required
-                          value={ma}
-                          onChange={(e) => setMa(e.target.value)}
-                        />
-                      </div>
                       <div className="mb-4">
                         <label htmlFor="product_title" className="form-label">
                           Tiêu đề
@@ -240,11 +232,11 @@ const EditProductMain = (props) => {
                         <select
                           className="form-control"
                           onChange={(e) => setCategory(e.target.value)}
-                          value={category}
+                          value={category ? String(category) : ""}
                         >
                           <option value=""></option>
                           {listCategory.map((item) => (
-                            <option value={item._id}>{item.name}</option>
+                            <option key={item.id} value={String(item.id)}>{item.name}</option>
                           ))}
                         </select>
                       </div>
@@ -284,7 +276,7 @@ const EditProductMain = (props) => {
                       </div>
                       <div className="mb-4">
                         {(preview && imageShow(preview)) ||
-                          (images.name &&
+                          (images?.name &&
                             imageShow(URL.createObjectURL(images)))}
                       </div>
                     </>

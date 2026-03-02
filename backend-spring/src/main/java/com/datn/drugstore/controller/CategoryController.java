@@ -1,10 +1,7 @@
 package com.datn.drugstore.controller;
 
-import com.datn.drugstore.dto.BannerDTO;
 import com.datn.drugstore.dto.CategoryDTO;
-import com.datn.drugstore.request.CreateBannerRequest;
 import com.datn.drugstore.request.CreateCategoryRequest;
-import com.datn.drugstore.request.UpdateBannerRequest;
 import com.datn.drugstore.request.UpdateCategoryRequest;
 import com.datn.drugstore.response.BaseResponse;
 import com.datn.drugstore.service.CategoryService;
@@ -77,36 +74,5 @@ public class CategoryController {
         Boolean isShow = body.get("isShow");
         CategoryDTO category = categoryService.updateCategoryStatus(id, isShow);
         return ResponseFactory.success(category, "Cập nhật trạng thái thành công");
-    }
-
-    // Banner endpoints
-    @GetMapping("/banner-detail/{detailId}")
-    public ResponseEntity<BaseResponse> getBannerById(@PathVariable Long detailId) {
-        BannerDTO banner = categoryService.getBannerById(detailId);
-        return ResponseFactory.success(banner);
-    }
-
-    @GetMapping("/all/banner")
-    public ResponseEntity<BaseResponse> getAllBanners() {
-        List<BannerDTO> banners = categoryService.getAllBanners();
-        return ResponseFactory.success(banners);
-    }
-
-    @PostMapping("/banner")
-    public ResponseEntity<BaseResponse> createBanner(@Valid @RequestBody CreateBannerRequest request) {
-        BannerDTO banner = categoryService.createBanner(request);
-        return ResponseFactory.success(banner, "Tạo banner thành công");
-    }
-
-    @PutMapping("/banner/{id}")
-    public ResponseEntity<BaseResponse> updateBanner(@PathVariable Long id, @RequestBody UpdateBannerRequest request) {
-        BannerDTO banner = categoryService.updateBanner(id, request);
-        return ResponseFactory.success(banner, "Cập nhật banner thành công");
-    }
-
-    @DeleteMapping("/banner/delete/{id}")
-    public ResponseEntity<BaseResponse> deleteBanner(@PathVariable Long id) {
-        categoryService.deleteBanner(id);
-        return ResponseFactory.successMessage("Xóa banner thành công");
     }
 }

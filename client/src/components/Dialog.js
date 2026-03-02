@@ -10,9 +10,7 @@ const Dialog = ({ idParent, isOpenDialog, setCloseDialog, onClickOpen }) => {
 
   useEffect(() => {
     if (idParent) {
-      new Promise(async () => {
-        await fetchData();
-      });
+      fetchData();
     }
   }, [idParent]);
 
@@ -55,9 +53,9 @@ const Dialog = ({ idParent, isOpenDialog, setCloseDialog, onClickOpen }) => {
             ) : (
               <ul className="menu menu-dialog">
                 {listItem.length > 0 ? (
-                  listItem.map((o, index) => (
+                  listItem.map((o) => (
                     <li
-                      key={index}
+                      key={o.id}
                       className="menu-item-con item-dialog"
                       onClick={() => redirectPage(o.id || o._id)}
                     >

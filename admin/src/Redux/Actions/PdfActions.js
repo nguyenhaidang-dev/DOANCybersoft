@@ -35,8 +35,7 @@ export const listPdf = () => async (dispatch, getState) => {
     };
 
     const { data } = await axios.get(`${URL}/api/pdf/all`, config);
-
-    dispatch({ type: PDF_LIST_SUCCESS, payload: data });
+    dispatch({ type: PDF_LIST_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -103,12 +102,11 @@ export const createPdf = (name, image, file) => async (dispatch, getState) => {
     };
 
     const { data } = await axios.post(
-      `${URL}/api/pdf/`,
+      `${URL}/api/pdf`,
       { name, image, file },
       config
     );
-
-    dispatch({ type: PDF_CREATE_SUCCESS, payload: data });
+    dispatch({ type: PDF_CREATE_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -129,7 +127,7 @@ export const editPdf = (id) => async (dispatch) => {
   try {
     dispatch({ type: PDF_EDIT_REQUEST });
     const { data } = await axios.get(`${URL}/api/pdf/${id}`);
-    dispatch({ type: PDF_EDIT_SUCCESS, payload: data });
+    dispatch({ type: PDF_EDIT_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -166,9 +164,8 @@ export const updatePdf = (product) => async (dispatch, getState) => {
       product,
       config
     );
-
-    dispatch({ type: PDF_UPDATE_SUCCESS, payload: data });
-    dispatch({ type: PDF_EDIT_SUCCESS, payload: data });
+    dispatch({ type: PDF_UPDATE_SUCCESS, payload: data.data });
+    dispatch({ type: PDF_EDIT_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message

@@ -2,7 +2,6 @@ import React from "react";
 import Message from "../LoadingError/Error";
 import Loading from "../LoadingError/Loading";
 import Orders from "./Orders";
-import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { URL } from "../../Redux/Url";
@@ -13,61 +12,52 @@ const OrderMain = () => {
   const [search1, setSearch1] = useState("");
   const [search2, setSearch2] = useState("");
   const [data, setData] = useState([]);
-  const orderList = useSelector((state) => state.orderList);
-  const { loading, error, orders } = orderList;
+  const [allOrders, setAllOrders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(async () => {
-    if (isSearch == 1) {
+  useEffect(() => {
+    const fetchAllOrders = async () => {
       try {
-        const data = await axios.get(`${URL}/api/orders/search/${search}`);
-        if (data.status === 200) {
-          setData(data.data.docs);
-        }
-      } catch (error) {
-        console.log(error);
+        setLoading(true);
+        const res = await axios.get(`${URL}/api/orders/all`);
+        setAllOrders(res.data.data || []);
+      } catch (err) {
+        setError("Không thể tải danh sách đơn hàng");
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+    fetchAllOrders();
+  }, []);
 
-    if (isSearch == 2) {
-      // status
-      try {
-        const data = await axios.get(`${URL}/api/orders/status/${search1}`);
-        if (data.status === 200) {
-          // console.log(data);
-          setData(data.data);
-        }
-      } catch (error) {
-        console.log(error);
+  useEffect(() => {
+    const fetchFiltered = async () => {
+      if (isSearch === 1 && search) {
+        try {
+          const res = await axios.get(`${URL}/api/orders/search/${search}`);
+          setData(res.data.data || []);
+        } catch (err) { setData([]); }
       }
-    }
-
-    if (isSearch == 3) {
-      // status
-      try {
-        const data = await axios.get(`${URL}/api/orders/option/${search2}`);
-        if (data.status === 200) {
-          // console.log(data);
-          setData(data.data);
-        }
-      } catch (error) {
-        console.log(error);
+      if (isSearch === 2 && search1 && search1 !== "default") {
+        try {
+          const res = await axios.get(`${URL}/api/orders/status/${search1}`);
+          setData(res.data.data || []);
+        } catch (err) { setData([]); }
       }
-    }
-
-    if (search1 && search2 && search1 != "default" && search2 != "default") {
-      try {
-        const data = await axios.get(
-          `${URL}/api/orders/combine/${search1}/${search2}`
-        );
-        if (data.status === 200) {
-          // console.log(data);
-          setData(data.data);
-        }
-      } catch (error) {
-        console.log(error);
+      if (isSearch === 2 && (!search1 || search1 === "default")) {
+        setData([]);
+        setIsSearch(0);
       }
-    }
-  }, [search, search1, search2]);
+      if (isSearch === 3 && search2) {
+        try {
+          const res = await axios.get(`${URL}/api/orders/option/${search2}`);
+          setData(res.data.data || []);
+        } catch (err) { setData([]); }
+      }
+    };
+    fetchFiltered();
+  }, [search, search1, search2, isSearch]);
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
@@ -123,7 +113,7 @@ const OrderMain = () => {
             ) : error ? (
               <Message variant="alert-danger">{error}</Message>
             ) : (
-              <Orders orders={isSearch != 0 ? data : orders} />
+              <Orders orders={isSearch !== 0 ? data : allOrders} />
             )}
           </div>
         </div>

@@ -58,34 +58,40 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authz -> authz
+                        // Method-specific product rules FIRST (before blanket permitAll)
+                        .requestMatchers("GET", "/api/products").permitAll()
+                        .requestMatchers("GET", "/api/products/{id}").permitAll()
+                        .requestMatchers("POST", "/api/products").hasRole("ADMIN")
+                        .requestMatchers("PUT", "/api/products/{id}").hasRole("ADMIN")
+                        .requestMatchers("DELETE", "/api/products/{id}").hasRole("ADMIN")
                         .requestMatchers(
                                 "/", "/api/users/login", "/api/users/register", "/api/users/get-only-email/**",
                                 "/uploads/**",
-                                "/api/products", "/api/products/search/**", "/api/products/searchHere/**",
-                                "/api/products/all-prescription", "/api/products/search-prescription/**",
-                                "/api/products/{id}",
+                                "/api/products/search/**", "/api/products/searchHere/**",
+                                "/api/products/all",
                                 "/api/category/all", "/api/category/all/status", "/api/category/all/status/no",
                                 "/api/category/all/status-detail/**", "/api/category/{id}",
-                                "/api/category/all/banner", "/api/category/banner-detail/**",
                                 "/api/pdf/all", "/api/pdf/{id}", "/api/pdf/searchpdf/**",
-                                "/api/orders/prescription-order", "/api/orders/order-repair",
+                                "/api/orders/order-repair",
                                 "/api/config/paypal"
                         ).permitAll()
                         .requestMatchers("POST", "/api/users").permitAll()
                         .requestMatchers("GET", "/api/users").hasRole("ADMIN")
+                        .requestMatchers("DELETE", "/api/users/{id}").hasRole("ADMIN")
                         .requestMatchers(
-                                "/api/users/profile", "/api/users/{id}", "/api/orders", "/api/orders/{id}",
+                                "/api/users/profile", "/api/users/check-session",
+                                "/api/users/{id}", "/api/orders", "/api/orders/{id}",
                                 "/api/orders/{id}/pay",
                                 "/api/orders/{id}/delivered"
                         ).authenticated()
                         .requestMatchers(
-                                "/api/products/create", "/api/products/update/**", "/api/products/delete/**",
                                 "/api/orders/all",
                                 "/api/orders/search/**", "/api/orders/status/**",
                                 "/api/orders/option/**", "/api/orders/combine/**",
                                 "/api/orders/filter/**", 
                                 "/api/category/create", "/api/category/update/**", "/api/category/delete/**",
-                                "/api/pdf/create", "/api/pdf/update/**", "/api/pdf/delete/**"
+                                "/api/pdf/create", "/api/pdf/update/**", "/api/pdf/delete/**",
+                                "/api/upload"
                         ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

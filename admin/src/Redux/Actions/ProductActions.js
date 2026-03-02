@@ -34,8 +34,7 @@ export const listProducts = () => async (dispatch, getState) => {
     };
 
     const { data } = await axios.get(`${URL}/api/products/all`, config);
-
-    dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data });
+    dispatch({ type: PRODUCT_LIST_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -86,7 +85,7 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
 
 // CREATE PRODUCT
 export const createProduct =
-  (name, price, description, image, countInStock, loanPrice, category, ma, bought) =>
+  (name, price, description, image, countInStock, loanPrice, category, bought) =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: PRODUCT_CREATE_REQUEST });
@@ -102,7 +101,7 @@ export const createProduct =
       };
 
       const { data } = await axios.post(
-        `${URL}/api/products/`,
+        `${URL}/api/products`,
         {
           name,
           price,
@@ -111,13 +110,11 @@ export const createProduct =
           countInStock,
           loanPrice,
           category,
-          ma,
           bought
         },
         config
       );
-
-      dispatch({ type: PRODUCT_CREATE_SUCCESS, payload: data });
+      dispatch({ type: PRODUCT_CREATE_SUCCESS, payload: data.data });
     } catch (error) {
       const message =
         error.response && error.response.data.message
@@ -138,7 +135,7 @@ export const editProduct = (id) => async (dispatch) => {
   try {
     dispatch({ type: PRODUCT_EDIT_REQUEST });
     const { data } = await axios.get(`${URL}/api/products/${id}`);
-    dispatch({ type: PRODUCT_EDIT_SUCCESS, payload: data });
+    dispatch({ type: PRODUCT_EDIT_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -175,9 +172,8 @@ export const updateProduct = (product) => async (dispatch, getState) => {
       product,
       config
     );
-
-    dispatch({ type: PRODUCT_UPDATE_SUCCESS, payload: data });
-    dispatch({ type: PRODUCT_EDIT_SUCCESS, payload: data });
+    dispatch({ type: PRODUCT_UPDATE_SUCCESS, payload: data.data });
+    dispatch({ type: PRODUCT_EDIT_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message

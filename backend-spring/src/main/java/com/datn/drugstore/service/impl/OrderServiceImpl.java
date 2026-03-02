@@ -89,8 +89,12 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Check if user owns the order or is admin
-        if (!order.getUser().getId().equals(userId)) {
+        // Allow admin to view any order
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        boolean isAdmin = user.getIsAdmin() != null && user.getIsAdmin();
+
+        if (!isAdmin && !order.getUser().getId().equals(userId)) {
             throw new RuntimeException("Not authorized to view this order");
         }
 
@@ -178,6 +182,10 @@ public class OrderServiceImpl implements OrderService {
         order.setIsDelivered(true);
         order.setDeliveredAt(LocalDateTime.now());
         order.setStatus(status);
+        if (!Boolean.TRUE.equals(order.getIsPaid())) {
+            order.setIsPaid(true);
+            order.setPaidAt(LocalDateTime.now());
+        }
 
         Order updatedOrder = orderRepository.save(order);
         return convertToDTO(updatedOrder);
@@ -257,7 +265,7 @@ public class OrderServiceImpl implements OrderService {
                                 Collectors.toList(),
                                 list -> {
                                     Map<String, Object> map = new HashMap<>();
-                                    map.put("_id", list.get(0).getCreatedAt().getMonthValue() + "/" + list.get(0).getCreatedAt().getYear());
+                                    map.put("id", list.get(0).getCreatedAt().getMonthValue() + "/" + list.get(0).getCreatedAt().getYear());
                                     map.put("count", (long) list.size());
                                     map.put("totalPrice", list.stream().mapToDouble(o -> o.getTotalPrice().doubleValue()).sum());
                                     return map;
@@ -266,74 +274,13 @@ public class OrderServiceImpl implements OrderService {
                 ))
                 .values()
                 .stream()
-                .sorted((a, b) -> Integer.compare((Integer) a.get("_id"), (Integer) b.get("_id")))
+                .sorted((a, b) -> {
+                    String[] aParts = ((String) a.get("id")).split("/");
+                    String[] bParts = ((String) b.get("id")).split("/");
+                    int yearCmp = Integer.compare(Integer.parseInt(aParts[1]), Integer.parseInt(bParts[1]));
+                    return yearCmp != 0 ? yearCmp : Integer.compare(Integer.parseInt(aParts[0]), Integer.parseInt(bParts[0]));
+                })
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public OrderDTO createPrescriptionOrder(CreateOrderRequest request, String emailUser, String nameUser) {
-        User user = userRepository.findByEmail(emailUser).orElse(null);
-        if (user == null) {
-            // Create new user
-            user = new User();
-            user.setName(nameUser);
-            user.setEmail(emailUser);
-            user.setPassword("$2b$10$VUS8veWKAvr9Si80fJy3Ye3ocGdAWfdTWKIGzWiT2QEqAbrh3xt22"); // default password
-            user = userRepository.save(user);
-        }
-
-        Order order = new Order();
-        order.setUser(user);
-        order.setPaymentMethod(request.getPaymentMethod());
-        order.setTaxPrice(request.getTaxPrice());
-        order.setShippingPrice(request.getShippingPrice());
-        order.setTotalPrice(request.getTotalPrice());
-        order.setTypePay(request.getTypePay());
-        order.setStatus(request.getStatus());
-        order.setIsDelivered(request.getIsDelivered());
-        order.setIsPaid(request.getIsPaid());
-        order.setDeliveredAt(request.getDeliveredAt() != null ? LocalDateTime.parse(request.getDeliveredAt()) : null);
-
-        // Create shipping address
-        ShippingAddress shippingAddress = new ShippingAddress();
-        shippingAddress.setAddress(request.getShippingAddress().getAddress());
-        shippingAddress.setCity(request.getShippingAddress().getCity());
-        shippingAddress.setPostalCode(request.getShippingAddress().getPostalCode());
-        shippingAddress.setCountry(request.getShippingAddress().getCountry());
-        shippingAddress.setOrder(order);
-        order.setShippingAddress(shippingAddress);
-
-        // Create payment result if provided
-        if (request.getPaymentResult() != null) {
-            PaymentResult paymentResult = new PaymentResult();
-            paymentResult.setPaymentId(request.getPaymentResult().getPaymentId());
-            paymentResult.setStatus(request.getPaymentResult().getStatus());
-            paymentResult.setUpdateTime(request.getPaymentResult().getUpdateTime());
-            paymentResult.setEmailAddress(request.getPaymentResult().getEmailAddress());
-            paymentResult.setOrder(order);
-            order.setPaymentResult(paymentResult);
-        }
-
-        // Create order items
-        List<OrderItem> orderItems = request.getOrderItems().stream().map(itemRequest -> {
-            Product product = productRepository.findById(itemRequest.getProduct())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-
-            OrderItem orderItem = new OrderItem();
-            orderItem.setName(itemRequest.getName());
-            orderItem.setQty(itemRequest.getQty());
-            orderItem.setImage(itemRequest.getImage());
-            orderItem.setPrice(itemRequest.getPrice());
-            orderItem.setLoanPrice(itemRequest.getLoanPrice());
-            orderItem.setProduct(product);
-            orderItem.setOrder(order);
-            return orderItem;
-        }).collect(Collectors.toList());
-        order.setOrderItems(orderItems);
-
-        Order savedOrder = orderRepository.save(order);
-        return convertToDTO(savedOrder);
     }
 
     @Override
@@ -357,17 +304,30 @@ public class OrderServiceImpl implements OrderService {
         }).collect(Collectors.toList()));
 
         ShippingAddress repairAddress = new ShippingAddress();
-        repairAddress.setAddress("Äáº·t táº¡i quĂ¡n");
-        repairAddress.setCity("Sáº£n pháº©m Ä‘Æ°á»£c mua táº¡i chá»—");
-        repairAddress.setPostalCode("QCODE-200");
-        repairAddress.setCountry("VN");
+        ShippingAddress originalAddress = originalOrder.getShippingAddress();
+        if (originalAddress != null) {
+            repairAddress.setAddress(originalAddress.getAddress());
+            repairAddress.setCity(originalAddress.getCity());
+            repairAddress.setPostalCode(originalAddress.getPostalCode());
+            repairAddress.setCountry(originalAddress.getCountry());
+        }
         repairAddress.setOrder(repairOrder);
         repairOrder.setShippingAddress(repairAddress);
 
-        repairOrder.setPaymentMethod("Paypal");
-        repairOrder.setTaxPrice(BigDecimal.ZERO);
-        repairOrder.setShippingPrice(BigDecimal.ZERO);
-        repairOrder.setTotalPrice(originalOrder.getTotalPrice());
+
+        BigDecimal itemsPrice = originalOrder.getOrderItems().stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQty())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal shippingPrice = itemsPrice.compareTo(new BigDecimal("500000")) > 0
+                ? BigDecimal.ZERO : new BigDecimal("30000");
+        BigDecimal taxPrice = itemsPrice.multiply(new BigDecimal("0.15"))
+                .setScale(2, java.math.RoundingMode.HALF_UP);
+        BigDecimal totalPrice = itemsPrice.add(shippingPrice).add(taxPrice);
+
+        repairOrder.setPaymentMethod(originalOrder.getPaymentMethod());
+        repairOrder.setTaxPrice(taxPrice);
+        repairOrder.setShippingPrice(shippingPrice);
+        repairOrder.setTotalPrice(totalPrice);
         repairOrder.setTypePay("buy");
         repairOrder.setIsPaid(false);
         repairOrder.setIsDelivered(false);
@@ -408,5 +368,4 @@ public class OrderServiceImpl implements OrderService {
                 order.getCreatedAt(), order.getUpdatedAt());
     }
 
-    // Migrated from NodeJS orderRoutes logic
 }

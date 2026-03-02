@@ -1,9 +1,10 @@
+import axios from "axios";
+
 export const checkImage = (file) => {
   let err = "";
   if (!file) return (err = "File does not exist.");
 
   if (file.size > 1024 * 1024)
-    // 1mb
     err = "The largest image size is 1mb.";
 
   if (file.type !== "image/jpeg" && file.type !== "image/png")
@@ -13,23 +14,16 @@ export const checkImage = (file) => {
 };
 
 export const imageUpload = async (image) => {
-  let imgArr = [];
+  if (!image || !(image instanceof Blob)) return null;
+
   const formData = new FormData();
-
   formData.append("file", image);
-  formData.append("upload_preset", "ncpanat5");
-  formData.append("cloud_name", "khanhbatluc");
 
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/khanhbatluc/auto/upload",
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
+  const { data } = await axios.post("/api/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
-  const data = await res.json();
-  return data.secure_url;
+  return data.data;
 };
 
 export const imageShow = (src) => {
@@ -49,5 +43,3 @@ export const monthNames = (months) => {
     return date.toLocaleString('en-US', { month: 'long' });
   });
 }
-
-// console.log(monthNames); // Output: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]

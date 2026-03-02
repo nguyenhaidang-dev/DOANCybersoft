@@ -150,15 +150,6 @@ public class OrderController {
         return ResponseFactory.success(stats);
     }
 
-    @PostMapping("/prescription-order")
-    public ResponseEntity<BaseResponse> createPrescriptionOrder(
-            @RequestBody CreateOrderRequest request,
-            @RequestParam String emailUser,
-            @RequestParam String nameUser) {
-        OrderDTO order = orderService.createPrescriptionOrder(request, emailUser, nameUser);
-        return ResponseFactory.created(order);
-    }
-
     @PostMapping("/order-repair")
     public ResponseEntity<BaseResponse> createOrderRepair(@RequestBody Map<String, Long> request) {
         Long orderId = request.get("id");

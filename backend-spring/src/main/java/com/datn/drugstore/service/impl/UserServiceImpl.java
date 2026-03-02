@@ -59,7 +59,6 @@ public class UserServiceImpl implements UserService {
         loginAttemptService.loginSucceeded(email);
         String token = jwtHelper.generateToken(user.getId());
         
-        // Lưu session vào Redis - logout session cũ nếu có
         tokenSessionService.saveActiveSession(email, token);
 
         return new UserDTO(user.getId(), user.getName(), user.getEmail(), user.getPhone(),
@@ -81,7 +80,6 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(user);
         String token = jwtHelper.generateToken(savedUser.getId());
         
-        // Lưu session vào Redis để token có thể được validate
         tokenSessionService.saveActiveSession(savedUser.getEmail(), token);
 
         return new UserDTO(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), savedUser.getPhone(), savedUser.getIsAdmin(), savedUser.getCreatedAt(), token);
@@ -107,8 +105,7 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = userRepository.save(user);
         String token = jwtHelper.generateToken(updatedUser.getId());
-        
-        // Update session with new token to prevent 401 on next request
+
         tokenSessionService.saveActiveSession(updatedUser.getEmail(), token);
 
         return new UserDTO(updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(), updatedUser.getPhone(), updatedUser.getIsAdmin(), updatedUser.getCreatedAt(), token);
@@ -122,5 +119,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        userRepository.delete(user);
     }
 }

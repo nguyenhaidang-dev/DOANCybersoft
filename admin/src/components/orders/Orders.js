@@ -5,10 +5,10 @@ import { useState } from "react";
 
 const Orders = (props) => {
   const { orders } = props;
-  const [orderS, setOrderS] = useState(orders);
+  const [orderS, setOrderS] = useState(Array.isArray(orders) ? orders : []);
 
   useEffect(() => {
-    setOrderS(orders);
+    setOrderS(Array.isArray(props.orders) ? props.orders : []);
   }, [props.orders]);
 
   const showPrice = (price) => {
@@ -46,7 +46,7 @@ const Orders = (props) => {
       </thead>
       <tbody>
         {orderS.map((order) => (
-          <tr key={order._id}>
+          <tr key={order.id}>
             <td>
               <b>{order.user && order.user.name}</b>
             </td>
@@ -73,7 +73,7 @@ const Orders = (props) => {
             <td>{moment(order.createdAt).format("MMM Do YY")}</td>
             <td>{renderStatus(order.status)}</td>
             <td className="d-flex justify-content-end align-item-center">
-              <Link to={`/order/${order._id}`} className="text-success">
+              <Link to={`/order/${order.id}`} className="text-success">
                 <i className="fas fa-eye"></i>
               </Link>
             </td>

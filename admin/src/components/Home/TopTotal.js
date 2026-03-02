@@ -15,45 +15,46 @@ const TopTotal = (props) => {
       currency: "VND",
     });
   };
+
+  const totalOrders = orders ? orders.length : 0;
+  const totalProducts = products ? products.length : 0;
+  const paidOrders = orders ? orders.filter((o) => o.isPaid).length : 0;
+
   return (
-    <div className="row">
-      <div className="col-lg-4">
-        <div className="card card-body mb-4 shadow-sm">
-          <article className="icontext">
-            <span className="icon icon-sm rounded-circle alert-primary">
-              <i className="text-primary fas fa-usd-circle"></i>
-            </span>
-            <div className="text">
-              <h6 className="mb-1">Doanh thu</h6>{" "}
-              <span>{showPrice(totalSale)}</span>
-            </div>
-          </article>
+    <div className="row g-3 mb-4">
+      {/* Revenue */}
+      <div className="col-lg-4 col-md-6">
+        <div className="stat-card stat-card-green">
+          <div className="stat-icon">
+            <i className="fas fa-dollar-sign"></i>
+          </div>
+          <div className="stat-label">Doanh thu</div>
+          <div className="stat-value">{showPrice(totalSale)}</div>
         </div>
       </div>
-      <div className="col-lg-4">
-        <div className="card card-body mb-4 shadow-sm">
-          <article className="icontext">
-            <span className="icon icon-sm rounded-circle alert-success">
-              <i className="text-success fas fa-bags-shopping"></i>
-            </span>
-            <div className="text">
-              <h6 className="mb-1">Đơn hàng</h6>
-              {orders ? <span>{orders.length}</span> : <span>0</span>}
-            </div>
-          </article>
+
+      {/* Orders */}
+      <div className="col-lg-4 col-md-6">
+        <div className="stat-card stat-card-teal">
+          <div className="stat-icon">
+            <i className="fas fa-shopping-bag"></i>
+          </div>
+          <div className="stat-label">Đơn hàng</div>
+          <div className="stat-value">{totalOrders}</div>
+          <div style={{ fontSize: "0.78rem", marginTop: "6px", opacity: 0.8 }}>
+            {paidOrders} đã thanh toán
+          </div>
         </div>
       </div>
-      <div className="col-lg-4">
-        <div className="card card-body mb-4 shadow-sm">
-          <article className="icontext">
-            <span className="icon icon-sm rounded-circle alert-warning">
-              <i className="text-warning fas fa-shopping-basket"></i>
-            </span>
-            <div className="text">
-              <h6 className="mb-1">Sản phẩm</h6>
-              {products ? <span>{products.length}</span> : <span>0</span>}
-            </div>
-          </article>
+
+      {/* Products */}
+      <div className="col-lg-4 col-md-6">
+        <div className="stat-card stat-card-amber">
+          <div className="stat-icon">
+            <i className="fas fa-capsules"></i>
+          </div>
+          <div className="stat-label">Sản phẩm</div>
+          <div className="stat-value">{totalProducts}</div>
         </div>
       </div>
     </div>
@@ -61,3 +62,4 @@ const TopTotal = (props) => {
 };
 
 export default TopTotal;
+

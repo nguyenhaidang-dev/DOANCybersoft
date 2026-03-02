@@ -10,20 +10,23 @@ const Sidebar = () => {
           <Link to="/" className="brand-wrap">
             <img
               src={Logo}
-              style={{ height: "46" }}
+              style={{ height: "46px" }}
               className="logo"
-              alt="Ecommerce dashboard template"
+              alt="DrugStore Admin"
             />
           </Link>
           <div>
-            <button className="btn btn-icon btn-aside-minimize">
-              <i className="text-muted fas fa-stream"></i>
+            <button className="btn btn-aside-minimize">
+              <i className="fas fa-stream"></i>
             </button>
           </div>
         </div>
 
         <nav>
           <ul className="menu-aside">
+
+            <li className="menu-section">Tổng quan</li>
+
             <li className="menu-item">
               <NavLink
                 activeClassName="active"
@@ -35,13 +38,16 @@ const Sidebar = () => {
                 <span className="text">Dashboard</span>
               </NavLink>
             </li>
+
+            <li className="menu-section">Quản lý</li>
+
             <li className="menu-item">
               <NavLink
                 activeClassName="active"
                 className="menu-link"
                 to="/products"
               >
-                <i className="icon fas fa-shopping-bag"></i>
+                <i className="icon fas fa-capsules"></i>
                 <span className="text">Sản phẩm</span>
               </NavLink>
             </li>
@@ -51,7 +57,7 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/addproduct"
               >
-                <i className="icon fas fa-cart-plus"></i>
+                <i className="icon fas fa-plus-circle"></i>
                 <span className="text">Thêm sản phẩm</span>
               </NavLink>
             </li>
@@ -61,7 +67,7 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/category"
               >
-                <i className="icon fas fa-list"></i>
+                <i className="icon fas fa-th-list"></i>
                 <span className="text">Danh mục</span>
               </NavLink>
             </li>
@@ -71,44 +77,25 @@ const Sidebar = () => {
                 className="menu-link"
                 to="/orders"
               >
-                <i className="icon fas fa-bags-shopping"></i>
+                <i className="icon fas fa-clipboard-list"></i>
                 <span className="text">Đơn hàng</span>
               </NavLink>
             </li>
+
+            <li className="menu-section">Hệ thống</li>
+
             <li className="menu-item">
               <NavLink
                 activeClassName="active"
                 className="menu-link"
                 to="/users"
               >
-                <i className="icon fas fa-user"></i>
+                <i className="icon fas fa-users"></i>
                 <span className="text">Người dùng</span>
               </NavLink>
             </li>
-            <li className="menu-item">
-              <NavLink
-                activeClassName="active"
-                className="menu-link"
-                to="/slide"
-              >
-                <i className="icon fas fa-store-alt"></i>
-                <span className="text">Banner</span>
-              </NavLink>
-            </li>
 
-            <li className="menu-item">
-              <NavLink
-                activeClassName="active"
-                className="menu-link"
-                to="/prescription"
-              >
-                <i className="icon fas fa-usd-circle"></i>
-                <span className="text">Kê đơn</span>
-              </NavLink>
-            </li>
           </ul>
-          <br />
-          <br />
         </nav>
       </aside>
     </div>
@@ -116,3 +103,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

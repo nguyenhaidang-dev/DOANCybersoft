@@ -41,16 +41,14 @@ export const login = (email, password) => async (dispatch) => {
       config
     );
 
-    if (!data.isAdmin === true) {
+    const userData = data.data;
+    if (!userData?.isAdmin) {
       toast.error("You are not Admin", ToastObjects);
-      dispatch({
-        type: USER_LOGIN_FAIL,
-      });
+      dispatch({ type: USER_LOGIN_FAIL });
     } else {
-      dispatch({ type: USER_LOGIN_SUCCESS, payload: data });
+      dispatch({ type: USER_LOGIN_SUCCESS, payload: userData });
+      localStorage.setItem("userInfo", JSON.stringify(userData));
     }
-
-    localStorage.setItem("userInfo", JSON.stringify(data));
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -89,8 +87,7 @@ export const listUser = () => async (dispatch, getState) => {
     };
 
     const { data } = await axios.get(`${URL}/api/users`, config);
-
-    dispatch({ type: USER_LIST_SUCCESS, payload: data });
+    dispatch({ type: USER_LIST_SUCCESS, payload: data.data });
   } catch (error) {
     const message =
       error.response && error.response.data.message
@@ -124,12 +121,11 @@ export const createUser =
         };
 
         const { data } = await axios.post(
-          `${URL}/api/users/`,
+          `${URL}/api/users`,
           { name, email, password },
           config
         );
-
-        dispatch({ type: USER_CREATE_SUCCESS, payload: data });
+        dispatch({ type: USER_CREATE_SUCCESS, payload: data.data });
       } catch (error) {
         const message =
           error.response && error.response.data.message
@@ -146,8 +142,8 @@ export const createUser =
 
     };
 
-// DELETE PRODUCT
-export const deleteUser = (email) => async (dispatch, getState) => {
+// DELETE USER
+export const deleteUser = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: USER_DELETE_REQUEST });
 
@@ -161,9 +157,10 @@ export const deleteUser = (email) => async (dispatch, getState) => {
       },
     };
 
-    await axios.delete(`${URL}/api/users/${email}`, config);
+    await axios.delete(`${URL}/api/users/${id}`, config);
 
     dispatch({ type: USER_DELETE_SUCCESS });
+    dispatch(listUser());
   } catch (error) {
     const message =
       error.response && error.response.data.message

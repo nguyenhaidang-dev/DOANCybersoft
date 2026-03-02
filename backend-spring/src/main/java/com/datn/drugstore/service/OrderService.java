@@ -18,6 +18,5 @@ public interface OrderService {
     List<OrderDTO> getOrdersByTypePay(String typePay);
     List<OrderDTO> getOrdersByStatusAndTypePay(String status, String typePay);
     List<Map<String, Object>> getOrderStatistics(String startDate, String endDate);
-    OrderDTO createPrescriptionOrder(CreateOrderRequest request, String emailUser, String nameUser);
     OrderDTO createOrderRepair(Long orderId);
 }

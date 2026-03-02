@@ -37,7 +37,7 @@ const SingleProduct = ({ history, match }) => {
 
   useEffect(() => {
     if (successCreateReview) {
-      alert("Review Submitted");
+      toast.success("Đã gửi đánh giá thành công!");
       setRating(0);
       setComment("");
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
@@ -67,7 +67,7 @@ const SingleProduct = ({ history, match }) => {
       return;
     }
     dispatch(addToCart(productId, qty, 'buy'));
-    history.push(`/cart/${productId}?qty=${qty}`);
+    history.push('/cart');
   };
 
   const AddToFavoriteHandle = () => {
@@ -228,7 +228,7 @@ const SingleProduct = ({ history, match }) => {
                     key={review._id}
                     className="mb-5 mb-md-3 bg-light p-3 shadow-sm rounded"
                   >
-                    <strong>{review.name}</strong>
+                    <strong>{review.userName || review.name}</strong>
                     <Rating value={review.rating} />
                     <span>{moment(review.createdAt).calendar()}</span>
                     <div className="alert alert-info mt-3">

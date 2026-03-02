@@ -17,11 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +36,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductDTO> getAllProducts(String keyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("id").descending());
         Page<Product> products;
-        if (keyword != null && !keyword.isEmpty()) {
-            products = productRepository.findByNameContainingIgnoreCase(keyword, pageable);
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            products = productRepository.findByNameContainingIgnoreCase(keyword.trim(), pageable);
         } else {
             products = productRepository.findAll(pageable);
         }
@@ -46,13 +48,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> getAllProductsAdmin() {
-        return productRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProductDTO> getAllProductsPrescription() {
         return productRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -79,7 +74,6 @@ public class ProductServiceImpl implements ProductService {
         product.setImage(request.getImage());
         product.setCountInStock(request.getCountInStock());
         product.setLoanPrice(request.getLoanPrice());
-        product.setMa(request.getMa());
         product.setIsBought(request.getBought());
 
         if (request.getCategory() != null) {
@@ -89,6 +83,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product savedProduct = productRepository.save(product);
+        savedProduct.setMa(String.valueOf(savedProduct.getId()));
+        productRepository.save(savedProduct);
         return convertToDTO(savedProduct);
     }
 
@@ -109,7 +105,6 @@ public class ProductServiceImpl implements ProductService {
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             product.setCategory(category);
         }
-        if (request.getMa() != null) product.setMa(request.getMa());
         if (request.getBought() != null) product.setIsBought(request.getBought());
 
         Product updatedProduct = productRepository.save(product);
@@ -130,7 +125,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Check if user already reviewed
         boolean alreadyReviewed = product.getReviews().stream()
                 .anyMatch(review -> review.getUser().getId().equals(user.getId()));
         if (alreadyReviewed) {
@@ -153,15 +147,6 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDTO> searchProducts(String type) {
         return productRepository.findByNameContainingIgnoreCase(type, PageRequest.of(0, 100))
                 .getContent().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<ProductDTO> searchPrescriptionProducts(String type) {
-        return productRepository.findByNameContainingIgnoreCase(type, PageRequest.of(0, 100))
-                .getContent().stream()
-                .filter(product -> product.getCategory() != null && "6448dce26d5176c1e67a4cb6".equals(product.getCategory().getId().toString()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -191,10 +176,12 @@ public class ProductServiceImpl implements ProductService {
                         product.getCategory().getParentCategory(), product.getCategory().getIsParent(),
                         product.getCategory().getCreatedAt(), product.getCategory().getUpdatedAt()) : null;
 
-        List<ProductReviewDTO> reviewDTOs = product.getReviews().stream()
-                .map(review -> new ProductReviewDTO(review.getId(), review.getRating(), review.getComment(),
-                        review.getUser().getName(), review.getUser().getId(), review.getCreatedAt()))
-                .collect(Collectors.toList());
+        List<ProductReviewDTO> reviewDTOs = product.getReviews() != null
+                ? product.getReviews().stream()
+                        .map(review -> new ProductReviewDTO(review.getId(), review.getRating(), review.getComment(),
+                                review.getUser().getName(), review.getUser().getId(), review.getCreatedAt()))
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
 
         return new ProductDTO(product.getId(), product.getMa(), product.getName(), product.getImage(),
                 product.getDescription(), reviewDTOs, product.getRating(), product.getNumReviews(),

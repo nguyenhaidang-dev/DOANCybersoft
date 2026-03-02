@@ -11,6 +11,8 @@ import Loading from "../LoadingError/Loading";
 import Message from "../LoadingError/Error";
 import moment from "moment";
 import { CSVLink, CSVDownload } from "react-csv";
+import { ORDER_DELIVERED_RESET } from "../../Redux/Constants/OrderConstants";
+import { toast } from "react-toastify";
 
 const OrderDetailmain = (props) => {
   const { orderId } = props;
@@ -24,6 +26,10 @@ const OrderDetailmain = (props) => {
   const { loading: loadingDelivered, success: successDelivered } = orderDeliver;
 
   useEffect(() => {
+    if (successDelivered) {
+      dispatch({ type: ORDER_DELIVERED_RESET });
+      toast.success("Đã cập nhật trạng thái đơn hàng!");
+    }
     dispatch(getOrderDetails(orderId));
   }, [dispatch, orderId, successDelivered]);
 
@@ -79,7 +85,7 @@ const OrderDetailmain = (props) => {
                 </span>
                 <br />
                 <small className="text-white mx-3 ">
-                  Mã hóa đơn: {order._id}
+                  Mã hóa đơn: {order.id}
                 </small>
               </div>
               <div className="col-lg-6 col-md-6 ms-auto d-flex justify-content-end align-items-center">

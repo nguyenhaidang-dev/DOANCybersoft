@@ -11,12 +11,17 @@ const Category = () => {
   const [dialog, setDialog] = useState(false);
 
   useEffect(() => {
-    return new Promise(async () => {
-      const res = await axios.get("/api/category/all/status");
-      if (res.status === 200) {
-        setListCategory(res.data.data || []);
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/api/category/all/status");
+        if (res.status === 200) {
+          setListCategory(res.data.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
       }
-    });
+    };
+    fetchCategories();
   }, []);
 
   const redirectPage = (href) => {

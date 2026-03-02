@@ -18,7 +18,6 @@ const ToastObjects = {
   autoClose: 2000,
 };
 const AddProductMain = () => {
-  const [ma, setMa] = useState("");
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [countInStock, setCountInStock] = useState(0);
@@ -33,6 +32,7 @@ const AddProductMain = () => {
   const [photoURL, setPhotoURL] = useState();
   const [openCrop, setOpenCrop] = useState(false);
   const [checkCrop, setCheckCrop] = useState(false);
+  const [originalFileName, setOriginalFileName] = useState("image.jpg");
   const fileRef = useRef();
 
   const dispatch = useDispatch();
@@ -41,12 +41,18 @@ const AddProductMain = () => {
   const { loading, error, product } = productCreate;
 
   useEffect(() => {
-    return new Promise(async () => {
-      const res = await axios.get("/api/category/all/status/no");
-      if (res.status === 200) {
-        setListCategory(res.data);
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("/api/category/all/status/no");
+        if (res.status === 200) {
+          const cats = res.data?.data ?? res.data;
+          setListCategory(Array.isArray(cats) ? cats : []);
+        }
+      } catch (err) {
+        console.error("Failed to load categories", err);
       }
-    });
+    };
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -60,7 +66,6 @@ const AddProductMain = () => {
       setPrice(0);
       setLoanPrice(0);
       setCategory("");
-      setMa("");
     }
   }, [product, dispatch]);
 
@@ -76,8 +81,7 @@ const AddProductMain = () => {
           image,
           countInStock,
           loanPrice,
-          category,
-          ma,
+          category ? Number(category) : null,
           bought
         )
       );
@@ -91,7 +95,8 @@ const AddProductMain = () => {
 
   useEffect(() => {
     if (checkCrop) {
-      setImages(file);
+      const namedFile = new File([file], originalFileName, { type: file.type });
+      setImages(namedFile);
       fileRef.current.value = null;
       setCheckCrop(false);
     }
@@ -100,6 +105,7 @@ const AddProductMain = () => {
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setOriginalFileName(file.name);
       setFile(file);
       setPhotoURL(URL.createObjectURL(file));
       setOpenCrop(true);
@@ -112,15 +118,15 @@ const AddProductMain = () => {
       <section className="content-main" style={{ maxWidth: "1200px" }}>
         <form onSubmit={submitHandler}>
           <div className="content-header">
-            <Link to="/products" className="btn btn-danger text-white">
-              Đi đến danh sách sản phẩm
-            </Link>
-            <h2 className="content-title">Thêm sản phẩm</h2>
-            <div>
+            <div className="d-flex align-items-center gap-2">
+              <Link to="/products" className="btn btn-danger text-white">
+                Đi đến danh sách sản phẩm
+              </Link>
               <button type="submit" className="btn btn-primary">
                 Thêm sản phẩm
               </button>
             </div>
+            <h2 className="content-title">Thêm sản phẩm</h2>
           </div>
 
           <div className="row mb-4">
@@ -129,20 +135,6 @@ const AddProductMain = () => {
                 <div className="card-body">
                   {error && <Message variant="alert-danger">{error}</Message>}
                   {loading && <Loading />}
-                  <div className="mb-4">
-                    <label htmlFor="product_title" className="form-label">
-                      Mã Đại Diện
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Type here"
-                      className="form-control"
-                      id="product_title"
-                      required
-                      value={ma}
-                      onChange={(e) => setMa(e.target.value)}
-                    />
-                  </div>
                   <div className="mb-4">
                     <label htmlFor="product_title" className="form-label">
                       Tiêu đề
@@ -193,7 +185,7 @@ const AddProductMain = () => {
                     >
                       <option value=""></option>
                       {listCategory.map((item) => (
-                        <option value={item._id}>{item.name}</option>
+                        <option key={item.id} value={String(item.id)}>{item.name}</option>
                       ))}
                     </select>
                   </div>

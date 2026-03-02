@@ -9,6 +9,16 @@ import Message from "./../components/LoadingError/Error";
 import moment from "moment";
 import axios from "axios";
 import { ORDER_PAY_RESET } from "../Redux/Constants/OrderConstants";
+import { toast } from "react-toastify";
+
+const fixEncoding = (str) => {
+  if (!str) return str;
+  try {
+    return decodeURIComponent(escape(str));
+  } catch (e) {
+    return str;
+  }
+};
 
 const OrderScreen = ({ match }) => {
   window.scrollTo(0, 0);
@@ -22,7 +32,6 @@ const OrderScreen = ({ match }) => {
   const { loading: loadingPay, success: successPay } = orderPay;
   const userLogin = useSelector((state) => state.userLogin);
 
-  // Calculate itemsPrice without mutating order object
   const calculatedItemsPrice = useMemo(() => {
     if (!order || !order.orderItems) return 0;
     
@@ -115,7 +124,7 @@ const OrderScreen = ({ match }) => {
     const numericOrderId = typeof orderId === 'string' ? parseInt(orderId, 10) : orderId;
     
     if (isNaN(numericOrderId)) {
-      alert("Lỗi: Order ID không hợp lệ. Vui lòng thử lại.");
+      toast.error("Lỗi: Order ID không hợp lệ. Vui lòng thử lại.");
       return;
     }
     
@@ -148,14 +157,14 @@ const OrderScreen = ({ match }) => {
   const handleReceive = async () => {
     try {
       if (!userLogin || !userLogin.userInfo) {
-        alert("Vui lòng đăng nhập để xác nhận nhận hàng.");
+        toast.error("Vui lòng đăng nhập để xác nhận nhận hàng.");
         return;
       }
 
       const { userInfo } = userLogin;
       
       if (!userInfo || !userInfo.token) {
-        alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
         return;
       }
       
@@ -166,10 +175,9 @@ const OrderScreen = ({ match }) => {
         },
       };
       
-      // Use Spring Boot API endpoint and correct field name
       const currentOrderId = order?.id || order?._id;
       if (!currentOrderId) {
-        alert("Không tìm thấy thông tin đơn hàng.");
+        toast.error("Không tìm thấy thông tin đơn hàng.");
         return;
       }
 
@@ -191,7 +199,6 @@ const OrderScreen = ({ match }) => {
       let errorMessage = "Có lỗi xảy ra khi cập nhật trạng thái. Vui lòng thử lại.";
       
       if (error.response) {
-        // Extract error message from BaseResponse wrapper
         const errorData = error.response.data;
         if (errorData && errorData.message) {
           errorMessage = errorData.message;
@@ -202,7 +209,7 @@ const OrderScreen = ({ match }) => {
         errorMessage = error.message;
       }
       
-      alert(errorMessage);
+      toast.error(errorMessage);
     }
   }
 
@@ -277,23 +284,23 @@ const OrderScreen = ({ match }) => {
                   </div>
                   <div className="col-md-8 center">
                     <h5>
-                      <strong>Deliver to</strong>
+                      <strong>Giao hàng đến</strong>
                     </h5>
                     <p>
-                      Address: {order.shippingAddress.city},{" "}
-                      {order.shippingAddress.address},{" "}
-                      {order.shippingAddress.postalCode}
+                      Địa chỉ: {fixEncoding(order.shippingAddress.city)},{" "}
+                      {fixEncoding(order.shippingAddress.address)},{" "}
+                      {fixEncoding(order.shippingAddress.postalCode)}
                     </p>
                     {order.isDelivered ? (
                       <div className="bg-info p-2 col-12">
                         <p className="text-white text-center text-sm-start">
-                          Delivered on {moment(order.deliveredAt).calendar()}
+                          Đã giao lúc {moment(order.deliveredAt).calendar()}
                         </p>
                       </div>
                     ) : (
                       <div className="bg-danger p-2 col-12">
                         <p className="text-white text-center text-sm-start">
-                          Not Delivered
+                          Chưa giao hàng
                         </p>
                       </div>
                     )}
@@ -379,10 +386,8 @@ const OrderScreen = ({ match }) => {
                   </tbody>
                 </table>
                 {!order.isPaid && (() => {
-                  // Normalize payment method for comparison (case-insensitive)
                   const paymentMethod = (order.paymentMethod || "").toLowerCase();
                   if (paymentMethod === "paypal") {
-                    // Check if PayPal Client ID is configured
                     const paypalClientId = order.paymentMethod === "Paypal" ? 
                       (localStorage.getItem("paypalClientId") || "") : "";
                     
