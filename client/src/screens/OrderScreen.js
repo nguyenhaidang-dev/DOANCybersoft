@@ -53,7 +53,6 @@ const OrderScreen = ({ match }) => {
     }
   }, [order]);
 
-  // Use calculated price or fallback to order.itemsPrice
   const displayItemsPrice = calculatedItemsPrice || order?.itemsPrice || 0;
 
   useEffect(() => {
