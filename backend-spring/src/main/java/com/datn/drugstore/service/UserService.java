@@ -17,4 +17,6 @@ public interface UserService {
     List<User> getAllUsers();
     Optional<User> findByEmail(String email);
     void deleteUser(Long id);
+    void sendForgotPasswordOtp(String email);
+    void resetPassword(String email, String otp, String newPassword);
 }

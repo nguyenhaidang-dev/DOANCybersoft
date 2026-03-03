@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
+import "./MedicalAIChatbot.css";
 
 const MedicalAIChatbot = () => {
     const [open, setOpen] = useState(false);

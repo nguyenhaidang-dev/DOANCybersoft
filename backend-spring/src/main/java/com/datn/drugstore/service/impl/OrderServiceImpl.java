@@ -49,14 +49,22 @@ public class OrderServiceImpl implements OrderService {
         shippingAddress.setOrder(order);
         order.setShippingAddress(shippingAddress);
 
-        // Create order items
+        // Create order items and decrement stock
         List<OrderItem> orderItems = request.getOrderItems().stream().map(itemRequest -> {
             Product product = productRepository.findById(itemRequest.getProduct())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
+            int qty = itemRequest.getQty() != null ? itemRequest.getQty() : 1;
+            int currentStock = product.getCountInStock() != null ? product.getCountInStock() : 0;
+            if (currentStock < qty) {
+                throw new RuntimeException("Sản phẩm \"" + product.getName() + "\" không đủ tồn kho (còn " + currentStock + ")");
+            }
+            product.setCountInStock(currentStock - qty);
+            productRepository.save(product);
+
             OrderItem orderItem = new OrderItem();
             orderItem.setName(itemRequest.getName());
-            orderItem.setQty(itemRequest.getQty());
+            orderItem.setQty(qty);
             orderItem.setImage(itemRequest.getImage());
             orderItem.setPrice(itemRequest.getPrice());
             orderItem.setLoanPrice(itemRequest.getLoanPrice());

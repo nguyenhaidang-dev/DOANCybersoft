@@ -13,6 +13,14 @@ import {
   USER_UPDATE_PROFILE_FAIL,
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
+  FORGOT_PASSWORD_REQUEST,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_FAIL,
+  FORGOT_PASSWORD_RESET,
+  RESET_PASSWORD_REQUEST,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_FAIL,
+  RESET_PASSWORD_RESET,
 } from "../Constants/UserContants";
 
 // LOGIN
@@ -70,6 +78,38 @@ export const userUpdateProfileReducer = (state = {}, action) => {
       return { loading: false, success: true, userInfo: action.payload };
     case USER_UPDATE_PROFILE_FAIL:
       return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
+
+// FORGOT PASSWORD
+export const forgotPasswordReducer = (state = {}, action) => {
+  switch (action.type) {
+    case FORGOT_PASSWORD_REQUEST:
+      return { loading: true };
+    case FORGOT_PASSWORD_SUCCESS:
+      return { loading: false, success: true };
+    case FORGOT_PASSWORD_FAIL:
+      return { loading: false, error: action.payload };
+    case FORGOT_PASSWORD_RESET:
+      return {};
+    default:
+      return state;
+  }
+};
+
+// RESET PASSWORD
+export const resetPasswordReducer = (state = {}, action) => {
+  switch (action.type) {
+    case RESET_PASSWORD_REQUEST:
+      return { loading: true };
+    case RESET_PASSWORD_SUCCESS:
+      return { loading: false, success: true };
+    case RESET_PASSWORD_FAIL:
+      return { loading: false, error: action.payload };
+    case RESET_PASSWORD_RESET:
+      return {};
     default:
       return state;
   }

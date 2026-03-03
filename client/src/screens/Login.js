@@ -58,6 +58,11 @@ const Login = ({ location, history }) => {
               Tạo tài khoản mới
             </Link>
           </p>
+          <p style={{ marginTop: "4px" }}>
+            <Link to="/forgot-password" style={{ color: "#6b7280", fontSize: "13px" }}>
+              Quên mật khẩu?
+            </Link>
+          </p>
         </form>
       </div>
     </>

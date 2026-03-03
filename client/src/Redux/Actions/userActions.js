@@ -13,6 +13,12 @@ import {
   USER_UPDATE_PROFILE_FAIL,
   USER_UPDATE_PROFILE_REQUEST,
   USER_UPDATE_PROFILE_SUCCESS,
+  FORGOT_PASSWORD_REQUEST,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_FAIL,
+  RESET_PASSWORD_REQUEST,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_FAIL,
 } from "../Constants/UserContants";
 import axios from "axios";
 import { ORDER_LIST_MY_RESET } from "../Constants/OrderConstants";
@@ -159,6 +165,36 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
     dispatch({
       type: USER_UPDATE_PROFILE_FAIL,
       payload: message,
+    });
+  }
+};
+
+// FORGOT PASSWORD — gửi OTP
+export const forgotPassword = (email) => async (dispatch) => {
+  try {
+    dispatch({ type: FORGOT_PASSWORD_REQUEST });
+    await axios.post("/api/users/forgot-password", { email });
+    dispatch({ type: FORGOT_PASSWORD_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: FORGOT_PASSWORD_FAIL,
+      payload:
+        error.response?.data?.message || error.message,
+    });
+  }
+};
+
+// RESET PASSWORD — xác nhận OTP + mật khẩu mới
+export const resetPassword = (email, otp, newPassword) => async (dispatch) => {
+  try {
+    dispatch({ type: RESET_PASSWORD_REQUEST });
+    await axios.post("/api/users/reset-password", { email, otp, newPassword });
+    dispatch({ type: RESET_PASSWORD_SUCCESS });
+  } catch (error) {
+    dispatch({
+      type: RESET_PASSWORD_FAIL,
+      payload:
+        error.response?.data?.message || error.message,
     });
   }
 };

@@ -66,6 +66,7 @@ public class SecurityConfig {
                         .requestMatchers("DELETE", "/api/products/{id}").hasRole("ADMIN")
                         .requestMatchers(
                                 "/", "/api/users/login", "/api/users/register", "/api/users/get-only-email/**",
+                                "/api/users/forgot-password", "/api/users/reset-password",
                                 "/uploads/**",
                                 "/api/products/search/**", "/api/products/searchHere/**",
                                 "/api/products/all",
