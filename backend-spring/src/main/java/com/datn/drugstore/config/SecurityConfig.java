@@ -58,7 +58,7 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authz -> authz
-                        // Method-specific product rules FIRST (before blanket permitAll)
+                        .requestMatchers("/api/users/profile").permitAll()
                         .requestMatchers("GET", "/api/products").permitAll()
                         .requestMatchers("GET", "/api/products/{id}").permitAll()
                         .requestMatchers("POST", "/api/products").hasRole("ADMIN")
