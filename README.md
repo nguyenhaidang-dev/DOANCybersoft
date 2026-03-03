@@ -21,6 +21,7 @@ This project focuses on:
 - Online payment integration with PayPal
 - Prescription upload and approval workflow
 - Redis caching for improved performance
+- AI-powered medical assistant chatbot (Google Gemini 2.5 Flash)
 - Containerized deployment with Docker
 
 ---
@@ -40,6 +41,7 @@ This project focuses on:
 - User profile management
 - Upload prescription for restricted medications
 - Email notification on registration (via Kafka + Gmail SMTP)
+- **AI Medical Assistant**: floating chatbot powered by Google Gemini 2.5 Flash for drug interaction queries, dosage guidance, and general health Q&A
 
 ---
 
@@ -62,14 +64,15 @@ This project focuses on:
 │   Client App    │     │    Admin App    │
 │  (ReactJS :3000)│     │ (ReactJS :4000) │
 └────────┬────────┘     └────────┬────────┘
-         │                       │
-         └───────────┬───────────┘
-                     │ REST API
-         ┌───────────▼───────────┐
-         │  Spring Boot Backend  │
-         │       (:8081)         │
-         └──┬──────┬──────┬──────┘
-            │      │      │
+         │  REST API (/api)       │
+         │  AI Proxy  (/ai) ──────┼──────────────────────────┐
+         └───────────┬───────────┘                           │
+                     │ REST API                              │
+         ┌───────────▼───────────┐              ┌────────────▼──────────┐
+         │  Spring Boot Backend  │              │  Medical AI Assistant │
+         │       (:8081)         │              │  Flask + Gemini 2.5   │
+         └──┬──────┬──────┬──────┘              │       (:5000)         │
+            │      │      │                     └───────────────────────┘
     ┌───────▼─┐ ┌──▼──┐ ┌▼──────┐
     │  MySQL  │ │Redis│ │ Kafka │
     └─────────┘ └─────┘ └───┬───┘
@@ -100,6 +103,7 @@ This project focuses on:
 | Payment        | PayPal REST SDK (Sandbox)           |
 | Authentication | Spring Security + JWT (jjwt 0.13.0) |
 | Email          | Spring Mail + Gmail SMTP            |
+| AI Chatbot     | Python Flask + Google Gemini 2.5 Flash |
 | DevOps         | Docker, Docker Compose              |
 
 ---
@@ -139,6 +143,13 @@ DOANCybersoft/
 │   ├── Dockerfile
 │   ├── docker-compose.yml       # Backend container
 │   └── docker-compose.kafka.yml # Kafka + Kafka UI for this project
+│
+├── Medical-Assisstant/          # AI Medical Chatbot service (port 5000)
+│   ├── app.py                   # Flask app with Gemini 2.5 Flash API
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── .env                     # GOOGLE_API_KEY (not committed)
 │
 └── README.md
 ```
@@ -212,13 +223,21 @@ docker-compose -f docker-compose.kafka.yml up -d
 **Build and start backend:**
 ```bash
 cd backend-spring
+mvn clean package -DskipTests
 docker build -t drugstore-backend .
 docker-compose up -d
 ```
 
-**View backend logs:**
+**Build and start AI Medical Assistant:**
+```bash
+cd Medical-Assisstant
+docker compose up --build -d
+```
+
+**View logs:**
 ```bash
 docker logs -f drugstore-backend
+docker logs -f medical-assistant
 ```
 
 ---
@@ -286,6 +305,27 @@ Registration confirmation emails are sent asynchronously using **Apache Kafka** 
 1. User registers → backend publishes event to Kafka topic `user-registration`
 2. Kafka consumer picks up event
 3. Spring Mail sends confirmation email via Gmail SMTP
+
+---
+
+## 🤖 AI Medical Assistant
+
+A floating chatbot integrated into the client frontend, powered by **Google Gemini 2.5 Flash**.
+
+- Built with **Python Flask** (port 5000), containerized with Docker
+- React client proxies `/ai/*` requests to the Flask service via Craco dev proxy
+- Supports natural language queries about medications, dosages, drug interactions, and general health advice
+- Fully isolated service — runs independently from the Spring Boot backend
+
+```
+User types question
+       ↓
+React client  →  POST /ai/api/chat  →  Flask (Docker :5000)
+                                              ↓
+                                    Google Gemini 2.5 Flash API
+                                              ↓
+                                    Response streamed back to UI
+```
 
 ---
 

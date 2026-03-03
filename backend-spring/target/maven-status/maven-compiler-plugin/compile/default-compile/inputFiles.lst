@@ -40,6 +40,7 @@ D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstor
 D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\exception\UnauthorizedException.java
 D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\filter\AuthenticationFilter.java
 D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\kafka\consumer\EmailConsumer.java
+D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\kafka\producer\OtpProducer.java
 D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\kafka\producer\RegistrationProducer.java
 D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\mapper\CategoryMapper.java
 D:\BackEndJava\DACK\DOANCybersoft\backend-spring\src\main\java\com\datn\drugstore\mapper\OrderMapper.java

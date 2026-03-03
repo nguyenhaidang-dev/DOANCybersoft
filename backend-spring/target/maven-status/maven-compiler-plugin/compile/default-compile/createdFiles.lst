@@ -7,6 +7,7 @@ com\datn\drugstore\exception\NotFoundException.class
 com\datn\drugstore\entity\PdfReview.class
 com\datn\drugstore\service\impl\EmailServiceImp.class
 com\datn\drugstore\entity\ProductReview.class
+com\datn\drugstore\kafka\producer\OtpProducer.class
 com\datn\drugstore\dto\PaymentResultDTO.class
 com\datn\drugstore\request\PaymentResultRequest.class
 com\datn\drugstore\request\UpdatePdfRequest.class
