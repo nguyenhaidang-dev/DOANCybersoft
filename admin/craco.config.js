@@ -3,7 +3,6 @@ const path = require('path');
 module.exports = {
   webpack: {
     configure: (webpackConfig) => {
-      // Fix: css-loader + webpack5 generates __webpack_exports__.d.e.f.a.u.l.t
       const traverseRules = (rules) => {
         if (!rules) return;
         rules.forEach((rule) => {

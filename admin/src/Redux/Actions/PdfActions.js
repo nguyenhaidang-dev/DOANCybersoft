@@ -51,7 +51,6 @@ export const listPdf = () => async (dispatch, getState) => {
   }
 };
 
-// DELETE PRODUCT
 export const deletePdf = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: PDF_DELETE_REQUEST });
@@ -84,7 +83,6 @@ export const deletePdf = (id) => async (dispatch, getState) => {
   }
 };
 
-// CREATE PRODUCT
 export const createPdf = (name, image, file) => async (dispatch, getState) => {
   try {
     dispatch({ type: PDF_CREATE_REQUEST });
@@ -122,7 +120,6 @@ export const createPdf = (name, image, file) => async (dispatch, getState) => {
   }
 };
 
-// EDIT PRODUCT
 export const editPdf = (id) => async (dispatch) => {
   try {
     dispatch({ type: PDF_EDIT_REQUEST });
@@ -143,7 +140,6 @@ export const editPdf = (id) => async (dispatch) => {
   }
 };
 
-// UPDATE PRODUCT
 export const updatePdf = (product) => async (dispatch, getState) => {
   try {
     dispatch({ type: PDF_UPDATE_REQUEST });

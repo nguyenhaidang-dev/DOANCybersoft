@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
 import { Link, useHistory } from "react-router-dom";
 import Product from "./Product";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,9 +14,6 @@ const MainProducts = () => {
   const [data, setData] = useState([]);
   const dispatch = useDispatch();
   let history = useHistory();
-
-  // const MainProducts = () => {
-  //   const dispatch = useDispatch();
 
   const productList = useSelector((state) => state.productList);
   const { loading, error, products } = productList;
@@ -103,7 +99,6 @@ const MainProducts = () => {
             <Message variant="alert-danger">{error}</Message>
           ) : (
             <div className="row">
-              {/* Products */}
               {isSearch == 0
                 ? products.map((product) => (
                     <Product product={product} key={product.id} />

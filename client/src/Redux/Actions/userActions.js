@@ -23,7 +23,6 @@ import {
 import axios from "axios";
 import { ORDER_LIST_MY_RESET } from "../Constants/OrderConstants";
 
-// LOGIN
 export const login = (email, password) => async (dispatch) => {
   try {
     dispatch({ type: USER_LOGIN_REQUEST });
@@ -40,7 +39,6 @@ export const login = (email, password) => async (dispatch) => {
       config
     );
     
-    // Extract user data from BaseResponse wrapper
     const userData = data.data;
     dispatch({ type: USER_LOGIN_SUCCESS, payload: userData });
 
@@ -56,7 +54,6 @@ export const login = (email, password) => async (dispatch) => {
   }
 };
 
-// LOGOUT
 export const logout = () => (dispatch) => {
   localStorage.removeItem("userInfo");
   dispatch({ type: USER_LOGOUT });
@@ -64,7 +61,6 @@ export const logout = () => (dispatch) => {
   dispatch({ type: ORDER_LIST_MY_RESET });
 };
 
-// REGISTER
 export const register = (name, email, phone, password) => async (dispatch) => {
   try {
     dispatch({ type: USER_REGISTER_REQUEST });
@@ -81,10 +77,8 @@ export const register = (name, email, phone, password) => async (dispatch) => {
       config
     );
     
-    // Extract user data from BaseResponse wrapper
     const userData = data.data;
     dispatch({ type: USER_REGISTER_SUCCESS, payload: userData });
-    // Không tự đăng nhập — user phải đăng nhập thủ công sau khi đăng ký
   } catch (error) {
     dispatch({
       type: USER_REGISTER_FAIL,
@@ -96,7 +90,6 @@ export const register = (name, email, phone, password) => async (dispatch) => {
   }
 };
 
-// USER DETAILS
 export const getUserDetails = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: USER_DETAILS_REQUEST });
@@ -112,7 +105,6 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
 
     const { data } = await axios.get(`/api/users/${id}`, config);
     
-    // Extract user data from BaseResponse wrapper
     const userData = data.data;
     dispatch({ type: USER_DETAILS_SUCCESS, payload: userData });
   } catch (error) {
@@ -130,7 +122,6 @@ export const getUserDetails = (id) => async (dispatch, getState) => {
   }
 };
 
-// UPDATE PROFILE
 export const updateUserProfile = (user) => async (dispatch, getState) => {
   try {
     dispatch({ type: USER_UPDATE_PROFILE_REQUEST });
@@ -148,7 +139,6 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
 
     const { data } = await axios.put(`/api/users/profile`, user, config);
     
-    // Extract user data from BaseResponse wrapper
     const userData = data.data;
     dispatch({ type: USER_UPDATE_PROFILE_SUCCESS, payload: userData });
     dispatch({ type: USER_LOGIN_SUCCESS, payload: userData });
@@ -169,7 +159,6 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
   }
 };
 
-// FORGOT PASSWORD — gửi OTP
 export const forgotPassword = (email) => async (dispatch) => {
   try {
     dispatch({ type: FORGOT_PASSWORD_REQUEST });
@@ -184,7 +173,6 @@ export const forgotPassword = (email) => async (dispatch) => {
   }
 };
 
-// RESET PASSWORD — xác nhận OTP + mật khẩu mới
 export const resetPassword = (email, otp, newPassword) => async (dispatch) => {
   try {
     dispatch({ type: RESET_PASSWORD_REQUEST });

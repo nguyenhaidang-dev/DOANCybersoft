@@ -22,7 +22,6 @@ public class KafkaConfig {
     @Value("${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}")
     private String bootstrapServers;
 
-    // PRODUCER CONFIG
     @Bean
     public ProducerFactory<String, String> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -37,7 +36,6 @@ public class KafkaConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    // CONSUMER CONFIG
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> props = new HashMap<>();

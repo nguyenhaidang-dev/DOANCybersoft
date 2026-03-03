@@ -18,7 +18,6 @@ import {
   PDF_UPDATE_SUCCESS,
 } from "../Constants/PdfContants";
 
-// ALL PRODUCTS
 export const pdfListReducer = (state = { products: [] }, action) => {
   switch (action.type) {
     case PDF_LIST_REQUEST:
@@ -32,7 +31,6 @@ export const pdfListReducer = (state = { products: [] }, action) => {
   }
 };
 
-// DELETE PRODUCT
 export const pdfDeleteReducer = (state = {}, action) => {
   switch (action.type) {
     case PDF_DELETE_REQUEST:
@@ -46,7 +44,6 @@ export const pdfDeleteReducer = (state = {}, action) => {
   }
 };
 
-// DELETE PRODUCT
 export const pdfCreateReducer = (state = {}, action) => {
   switch (action.type) {
     case PDF_CREATE_REQUEST:
@@ -62,7 +59,6 @@ export const pdfCreateReducer = (state = {}, action) => {
   }
 };
 
-// EDIT PRODUCT
 export const pdfEditReducer = (
   state = { product: { reviews: [] } },
   action
@@ -79,7 +75,6 @@ export const pdfEditReducer = (
   }
 };
 
-// UPDATE PRODUCT
 export const pdfUpdateReducer = (state = { product: {} }, action) => {
   switch (action.type) {
     case PDF_UPDATE_REQUEST:

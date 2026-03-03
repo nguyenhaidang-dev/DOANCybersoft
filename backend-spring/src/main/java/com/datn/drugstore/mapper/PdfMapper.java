@@ -25,9 +25,6 @@ public class PdfMapper {
         dto.setCreatedAt(pdf.getCreatedAt());
         dto.setUpdatedAt(pdf.getUpdatedAt());
         
-        // Map reviews if needed (lazy loaded)
-        // dto.setReviews(...);
-        
         return dto;
     }
 

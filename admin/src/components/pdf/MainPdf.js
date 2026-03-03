@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
 import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { listPdf } from "../../Redux/Actions/PdfActions";
@@ -33,7 +32,6 @@ const MainPdf = () => {
       if (data.status === 200) {
         setData(data.data);
         setIsSearch(1);
-        // console.log(data);
       }
     } catch (error) {
       console.log(error);
@@ -91,7 +89,6 @@ const MainPdf = () => {
             <Message variant="alert-danger">{error}</Message>
           ) : (
             <div className="row">
-              {/* Products */}
               {isSearch == 0
                 ? products.map((product) => (
                     <Pdf product={product} key={product.id} />

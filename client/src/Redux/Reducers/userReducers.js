@@ -23,7 +23,6 @@ import {
   RESET_PASSWORD_RESET,
 } from "../Constants/UserContants";
 
-// LOGIN
 export const userLoginReducer = (state = {}, action) => {
   switch (action.type) {
     case USER_LOGIN_REQUEST:
@@ -39,7 +38,6 @@ export const userLoginReducer = (state = {}, action) => {
   }
 };
 
-// REGISTER
 export const userRegisterReducer = (state = {}, action) => {
   switch (action.type) {
     case USER_REGISTER_REQUEST:
@@ -53,7 +51,6 @@ export const userRegisterReducer = (state = {}, action) => {
   }
 };
 
-// USER DETAILS
 export const userDetailsReducer = (state = { user: {} }, action) => {
   switch (action.type) {
     case USER_DETAILS_REQUEST:
@@ -69,7 +66,6 @@ export const userDetailsReducer = (state = { user: {} }, action) => {
   }
 };
 
-// UPDATE PROFILE
 export const userUpdateProfileReducer = (state = {}, action) => {
   switch (action.type) {
     case USER_UPDATE_PROFILE_REQUEST:
@@ -83,7 +79,6 @@ export const userUpdateProfileReducer = (state = {}, action) => {
   }
 };
 
-// FORGOT PASSWORD
 export const forgotPasswordReducer = (state = {}, action) => {
   switch (action.type) {
     case FORGOT_PASSWORD_REQUEST:
@@ -99,7 +94,6 @@ export const forgotPasswordReducer = (state = {}, action) => {
   }
 };
 
-// RESET PASSWORD
 export const resetPasswordReducer = (state = {}, action) => {
   switch (action.type) {
     case RESET_PASSWORD_REQUEST:

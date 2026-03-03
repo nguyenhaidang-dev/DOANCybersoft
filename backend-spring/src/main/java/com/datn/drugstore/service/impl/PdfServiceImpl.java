@@ -50,7 +50,6 @@ public class PdfServiceImpl implements PdfService {
     @Override
     @Transactional
     public PdfDTO createPdf(CreatePdfRequest request, Long userId) {
-        // Check if pdf name exists
         List<Pdf> existing = pdfRepository.findAll().stream()
                 .filter(p -> p.getName().equals(request.getName()))
                 .collect(Collectors.toList());
@@ -95,7 +94,6 @@ public class PdfServiceImpl implements PdfService {
         Pdf pdf = pdfRepository.findById(pdfId)
                 .orElseThrow(() -> new RuntimeException("Pdf not found"));
 
-        // Check if user already reviewed
         boolean alreadyReviewed = pdf.getReviews().stream()
                 .anyMatch(review -> review.getUser().getId().equals(user.getId()));
         if (alreadyReviewed) {

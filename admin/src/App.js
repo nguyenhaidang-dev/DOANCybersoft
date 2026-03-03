@@ -21,7 +21,6 @@ import { listOrders } from "./Redux/Actions/OrderActions";
 import AddUser from "./screens/AddUser";
 import axios from "axios";
 
-// Global axios interceptor: tự động đính token vào mọi request
 axios.interceptors.request.use(
   (config) => {
     const userInfo = localStorage.getItem("userInfo")
@@ -60,11 +59,6 @@ function App() {
           <PrivateRouter path="/addproduct" component={AddProduct} />
           <PrivateRouter path="/users" component={UsersScreen} />
           <PrivateRouter path="/adduser" component={AddUser} />
-          {/* pdf router */}
-          {/* <PrivateRouter path="/pdf" component={PdfScreen} />
-          <PrivateRouter path="/showpdf/:id" component={PDF} />
-          <PrivateRouter path="/addpdf" component={AddPdf} />
-          <PrivateRouter path="/pdfs/:id/edit" component={PdfEditScreen} /> */}
           <PrivateRouter
             path="/product/:id/edit"
             component={ProductEditScreen}

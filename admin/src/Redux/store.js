@@ -42,7 +42,6 @@ const reducer = combineReducers({
   pdfUpdate: pdfUpdateReducer,
 });
 
-// login
 const userInfoFromLocalStorage = localStorage.getItem("userInfo")
   ? JSON.parse(localStorage.getItem("userInfo"))
   : null;

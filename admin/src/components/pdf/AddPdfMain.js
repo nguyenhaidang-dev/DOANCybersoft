@@ -53,8 +53,6 @@ const AddPdfMain = () => {
 
   const fileType = ["application/pdf"];
   const handlePdf = async (e) => {
-    // const fileImage = await imageUpload(e.target.files[0]);
-    // setFile(e.target.files[0]);
     let selectedFile = e.target.files[0];
     if (selectedFile) {
       if (selectedFile && fileType.includes(selectedFile.type)) {

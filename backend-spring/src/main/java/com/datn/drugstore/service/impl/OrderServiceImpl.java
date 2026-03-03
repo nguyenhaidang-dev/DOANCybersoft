@@ -40,7 +40,6 @@ public class OrderServiceImpl implements OrderService {
         order.setTypePay(request.getTypePay());
         order.setIsReceive(false);
 
-        // Create shipping address
         ShippingAddress shippingAddress = new ShippingAddress();
         shippingAddress.setAddress(request.getShippingAddress().getAddress());
         shippingAddress.setCity(request.getShippingAddress().getCity());
@@ -49,7 +48,6 @@ public class OrderServiceImpl implements OrderService {
         shippingAddress.setOrder(order);
         order.setShippingAddress(shippingAddress);
 
-        // Create order items and decrement stock
         List<OrderItem> orderItems = request.getOrderItems().stream().map(itemRequest -> {
             Product product = productRepository.findById(itemRequest.getProduct())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -97,7 +95,6 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        // Allow admin to view any order
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         boolean isAdmin = user.getIsAdmin() != null && user.getIsAdmin();
@@ -168,7 +165,6 @@ public class OrderServiceImpl implements OrderService {
                 paymentResult.setOrder(order);
                 order.setPaymentResult(paymentResult);
             } catch (Exception e) {
-                // Continue without PaymentResult - order can still be marked as paid
             }
         }
 

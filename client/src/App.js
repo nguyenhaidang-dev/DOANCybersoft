@@ -23,7 +23,7 @@ import FavoriteScreen from "./screens/FavoriteScreen";
 import ForgotPassword from "./screens/ForgotPassword";
 import MedicalAIChatbot from "./components/MedicalAIChatbot";
 
-const POLL_INTERVAL = 30000; // 30 giây
+const POLL_INTERVAL = 30000;
 
 const App = () => {
   const handleSessionExpired = (message) => {

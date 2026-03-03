@@ -30,13 +30,9 @@ public class ProductMapper {
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUpdatedAt(product.getUpdatedAt());
         
-        // Map category if exists
         if (product.getCategory() != null) {
             dto.setCategory(CategoryMapper.toDTO(product.getCategory()));
         }
-        
-        // Map reviews if needed (lazy loaded, be careful)
-        // dto.setReviews(...);
         
         return dto;
     }
